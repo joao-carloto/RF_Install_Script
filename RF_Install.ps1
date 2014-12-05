@@ -400,13 +400,13 @@ catch {
 echo "Running a sample test..."
 pybot  c:\Temp\test.txt
 
-
+<#
 if(Test-Path c:\Temp\report.html) {Invoke-Item c:\Temp\report.html}
 
 if(Test-Path c:\Temp\report.html) {Remove-Item   c:\Temp\report.html  | out-null}
 if(Test-Path c:\Temp\log.html) {Remove-Item   c:\Temp\log.html   | out-null}
 if(Test-Path c:\Temp\test.txt) { Remove-Item   c:\Temp\test.txt  | out-null}
-
+#>
 
 echo "Everything is concluded"
 pause
