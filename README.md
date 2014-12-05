@@ -19,14 +19,14 @@ IMPORTANT! This script uses the 'setx' command to modify the PATH user variable.
 This means it won't work in Windows XP or previous, unless it's installed from the Service Pack 2 Support Tools.
 
 IMPORTANT! The installer download locations were valid at the time of this scrip conception, but these may change. 
-If you find some invalid URL please report an issue at http://github.com/joao-carloto/RF_Installer
+If you find some invalid URL please report an issue at https://github.com/joao-carloto/RF_Install_Script/issues
 
 IMPORTANT! If you really want to do selenium tests on IE, beware that there are some necessary browser configurations to be made.
 This script doesn't deal with those. For more info check https://code.google.com/p/selenium/wiki/InternetExplorerDriver#Required_Configuration
 
 Script: RF_Installer.ps1
 Author: João Carloto, Twitter: @JMCarloto
-Github repo: http://github.com/joao-carloto/RF_Installer
+Github repo: https://github.com/joao-carloto/RF_Install_Script
 License: Apache 2.0
 Version: 0.1
 Dependencies: Internet connectivity
