@@ -1,3 +1,10 @@
+###########################
+## Robot Framework Test Results
+###########################
+report.html
+log.html
+output.xml
+
 #################
 ## Eclipse
 #################

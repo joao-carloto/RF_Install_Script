@@ -391,7 +391,7 @@ catch {
    echo "Installing RIDE..."
    pip install robotframework-ride   | out-null
    echo "Opening RIDE..."
-   Start-Process ride.py
+   Start-Process ride.py   c:\Temp\test.txt
 }
 
 #TODO put report in specific folder
