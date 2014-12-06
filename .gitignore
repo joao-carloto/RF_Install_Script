@@ -1,6 +1,7 @@
 ###########################
-## Robot Framework Test Results
+## Robot Framework Test Files
 ###########################
+test.txt
 report.html
 log.html
 output.xml

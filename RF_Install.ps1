@@ -2,9 +2,9 @@
 .SYNOPSIS
 
 This Windows PowerShell script will download and install the Robot Framework, all it's required dependencies (if not allready available) and some extra libraries and tools.
-If necessary, it will also modify the user 'path' environement variable, so to include the necessary folders.
+If necessary, it will also modify the user 'path' environment variable, so to include the necessary folders.
 In the end of the process, the following resources should be installed:
-- Python (version 2.7.8 will be downloaded if no RF compatible version is allready present).
+- Python (version 2.7.8 will be downloaded if no RF compatible version is already present).
 - PIP (used to install RF, Selenium2library and RIDE)
 - Robot Framework
 - Selenium2library
@@ -34,30 +34,34 @@ Dependencies: Internet connectivity
               The 'setx' command
 
 
+
 .USAGE
 
 -Save this script into a file. Don't forget the .ps1 extension.
 -Right click the file and choose 'Run with PowerShell'.
 
 
+
 .DESCRIPTION
 
-Python Intallation
+Python Installation
 
 Starts by running the 'python -V' command
-If a compatible version is found (2.5, 2.6 or 2.7) it will read the path environement variable to get it's location and store it.
-If an incompatible version is found, it will show a warning to remove it from the PATH environement variable or rename python.exe to something else (e.g. python3.exe) and rerun this script.
+If a compatible version is found (2.5, 2.6 or 2.7) it will read the path environment variable to get it's location and store it.
+If an incompatible version is found, it will show a warning to remove it from the PATH environment variable or rename python.exe to something else (e.g. python3.exe) and rerun this script.
 If the 'python -V' command fails it will search for python.exe in it's standard locations (e.g. c:\python27\).
-If it's present, it will assume that there's allready a valid installation and just add it's location to 'path'.
+If it's present, it will assume that there's already a valid installation and just add it's location to 'path'.
 If it can't find it, it will download a compatible python .msi installer and run it. Afterwards it will add it's location to 'path'.
+
 
 
 PIP Installation
 
 Starts by running the 'pip -V' command
 If the 'pip -V' command fails, it will search for pip.exe in it's standard locations (e.g. c:\python27\Scripts\).
-If it's present, it will assume that there's allready a valid installation and just add it's location to 'path'.
-If it can't find it, it will download the installer and run it, afterwars it will add it's location to 'path'.
+If it's present, it will assume that there's already a valid installation and just add it's location to 'path'.
+If it can't find it, it will download the installer and run it, afterwards it will add it's location to 'path'.
+
 
 
 Robot Framework Installation
@@ -66,16 +70,29 @@ Starts by running the 'pybot --version' command
 If it fails, will install the robot framework using PIP
 
 
+
 Selenium2Library Installation
 
 Starts by checking if the <python folder>\Lib\site-packages.\Selenium2Library folder exists.
 If it fails, will install the selenium2libraryu using PIP.
 
 
+
+Selenium Drivers for Internet Explorer and Chrome
+
+Starts by running the --help command of the drivers.
+If it fails, downloads the .zip files with the drivers.
+If necessary, creates a folder to place the drivers.
+Unzips the drivers to that folder.
+Adds the folder to PATH
+
+ 
+ 
 wxPython Installation
 
-Starts by checking if the <python folder>\Lib\site-packages\wx-2.8-msw-unicode\wxPython folder exists
-If it fails, downloadds the wxPython installer and runs it.
+Starts by checking if the <python folder>\Lib\site-packages\wx-2.8-msw-unicode\wxPython folder exists.
+If it fails, downloads the wxPython installer and runs it.
+
 
 
 RIDE Installation
@@ -85,10 +102,12 @@ If it fails, will install RIDE using PIP.
 Tries to open RIDE again.
 
 
+
 Demo Test
 
-Writes a test scrip on temporary .txt file.
-Runs the demo test script using pybot
+If Firefox or Chrome are installed, writes a demo test scrip on a .txt file.
+IE won't be used because of needed additional configurations.
+Runs the test script using pybot.
 #>
 
 
@@ -160,7 +179,7 @@ function Expand-ZipFile {
 			if($Archive.Entries.Count -eq 1) {
 				# Except, if they asked for an OutputPath with an extension on it, we'll rename the file to that ...
 				if([System.IO.Path]::GetExtension($Destination)) {
-					Move-Item (Join-Path $OutputPath $Archive.Entries[0].FullName) $Destination
+					Move-Item (Join-Path $OutputPath $Archive.Entries[0].FullName) $Destination 
 				} else {
 					Get-Item (Join-Path $OutputPath $Archive.Entries[0].FullName)
 				}
@@ -181,6 +200,35 @@ function Expand-ZipFile {
 # Add the alias
 new-alias unzip expand-zipfile
 
+function getDemoBrowser {
+	#.Synopsis
+	#  Check if Firefox or Chrome are installed to do a demo test run
+    #  Won't return IE due to the need of additional configurations
+
+    #Check if Firefox is installed
+    if (${env:programfiles(x86)}) {
+         $firefox_path = join-path "${env:programfiles(x86)}" "Mozilla Firefox\firefox.exe" 
+    } else { 
+        $firefox_path = join-path "${env:programfiles}" "Mozilla Firefox\firefox.exe" 
+    }
+    if (test-path $firefox_path) {
+       $browser = "Firefox"
+       return  $browser
+    } 
+
+    #Check if Chrome is installed
+    if (${env:programfiles(x86)}){ 
+        $firefox_path = join-path "${env:programfiles(x86)}" "Google\Chrome\Application\chrome.exe" 
+    } else {
+        $firefox_path = join-path "${env:programfiles}" "Google\Chrome\Application\chrome.exe" 
+    }
+    if (test-path $firefox_path) {
+       $browser = "Chrome"
+       return  $browser
+    }
+    return     $false
+}
+
 
 #THE REAL WORK STARTS HERE
 
@@ -195,11 +243,11 @@ try {
         Exit 
     } else {
       echo  "A Python version ($pythonVersion) compatible with Robot Framework is already installed"
-      $env:path -match "([^;]*\\python2[567])([^\\]|$)" | out-null
+      $env:path -match "([^;]*\\python2[567])([^\\]|$)" | Out-null
       $pythonPath = $matches[1]
     }
 } catch  {
-    echo "Could not get the python version"
+    echo "Could not get the local python version"
     if (Test-Path "c:\python27\python.exe" -PathType Any) {
         $pythonPath = "c:\python27"
     } elseif (Test-Path "c:\python26\python.exe" -PathType Any) {
@@ -226,7 +274,7 @@ try {
         echo "Adding the python folder to the PATH environment variable..."
     }
     #This is th user path not the system
-    setx path "$userPath;$pythonPath"   | out-null
+    setx path "$userPath;$pythonPath"   | Out-null
     $userPath = [System.Environment]::GetEnvironmentVariable("path","User")
     $env:path = [System.Environment]::GetEnvironmentVariable("path","Machine") + ";$userPath"
 }
@@ -239,8 +287,8 @@ try {$pipVersion = pip -V
     echo "Unable to get PIP version"
     $pipExists = Test-Path "$pythonPath\Scripts\pip.exe" -PathType Any
     if($pipExists) {
-        echo  "PIP seems to be installed"
-        echo  "We'll just add the Scripts folder to the PATH environment variable..."
+        echo  "PIP seems to be installed although not included in the PATH environment variable"
+        echo  "We'll just add the Scripts folder to PATH..."
     }
     else {
         echo "PIP doesn't seem to be installed"
@@ -255,7 +303,7 @@ try {$pipVersion = pip -V
         Remove-Item   $dest
         echo  "Adding the Scripts folder to the PATH environment variable..."
     }
-    setx path "$userPath;$pythonPath\Scripts"  | out-null
+    setx path "$userPath;$pythonPath\Scripts"  | Out-null
     $userPath = [System.Environment]::GetEnvironmentVariable("path","User")
     $env:path = [System.Environment]::GetEnvironmentVariable("path","Machine") + ";$userPath"
 }
@@ -263,102 +311,104 @@ try {$pipVersion = pip -V
 
 #Install the Robot Framework
 try {
-$RFVersion = pybot --version
-echo "Robot Framework is installed with version: $RFVersion"
+    $RFVersion = pybot --version
+    echo "Robot Framework is installed with version: $RFVersion"
 } catch {
     echo "Unable to get the Robot Framework version"
     echo "Installing RobotFramework..."
-    pip install robotframework  | out-null
+    pip install robotframework  | Out-null
 }
 
 
 #Install the Selenium2library
 $seleniumFolderExists = Test-Path "$pythonPath\Lib\site-packages\Selenium2Library" -PathType Any
 if($seleniumFolderExists) {
-    echo  "The selenium2library seems to be installed."
+    echo  "The Selenium2library seems to be installed."
     }
 else { 
-    echo "The selenium2library doesn't seem to be installed"
-    echo "Installing the selenium2library..."
-    pip install robotframework-selenium2library  | out-null
+    echo "The Selenium2library doesn't seem to be installed"
+    echo "Installing the Selenium2library..."
+    pip install robotframework-selenium2library  | Out-null
 }
 
 
 #Install selenium IE driver
 try {
-   IEDriverServer --help | out-null
-   echo "The Selenium IE driver seems to be installed."
+   IEDriverServer --help | Out-null
+   echo "The Selenium IE driver is installed."
 } 
 catch {
-   echo "Selenium IE driver doesn't seem to be installed."
-   echo "Downloading Selenium IE driver ZIP..."
-   $source = $selIEDriverURL
-   $Filename = [System.IO.Path]::GetFileName($source)
-   $dest = "c:\Temp\$Filename"
-   $wc = New-Object System.Net.WebClient
-   $wc.DownloadFile($source, $dest)
+    echo "Selenium IE driver doesn't seem to be installed."
+    echo "Downloading Selenium IE driver ZIP..."
+    $source = $selIEDriverURL
+    $Filename = [System.IO.Path]::GetFileName($source)
+    $dest = "c:\Temp\$Filename"
+    $wc = New-Object System.Net.WebClient
+    $wc.DownloadFile($source, $dest)
 
-   if (!(Test-Path $selDriversFolder)) {
-      echo "Creating a folder for the Selenium drivers."
-      New-Item -ItemType directory -Path $selDriversFolder  | out-null
-   }
-   echo "Extracting Selenium IE driver to $selDriversFolder"
-
-   try {
-    unzip  $dest  $selDriversFolder | out-null
-    } catch {
-        echo "Warning! The unzip of $dest failed. Did the file already exist at $selDriversFolder?"
+    if (!(Test-Path $selDriversFolder)) {
+        echo "Creating a folder for the Selenium drivers."
+        New-Item -ItemType directory -Path $selDriversFolder  | Out-null
+    }
+    if(!(Test-Path "$selDriversFolder\IEDriverServer.exe")) {
+        echo "Extracting Selenium IE driver to $selDriversFolder"
+        unzip  $dest  $selDriversFolder | Out-null
+        #By some reson this does not end up with the correct name the first time we try to unzip it. Doesn't happen with chrome driver. Check better solution later.
+        if(Test-Path "$selDriversFolder\IEDriverServer_Win32_2.44.0") {
+            Rename-Item "$selDriversFolder\IEDriverServer_Win32_2.44.0" IEDriverServer.exe
+        }
     }
     echo "Adding $selDriversFolder to path"
-    setx path "$userPath;$selDriversFolder"   | out-null
+    setx path "$userPath;$selDriversFolder"   | Out-null
     $userPath = [System.Environment]::GetEnvironmentVariable("path","User")
     $env:path = [System.Environment]::GetEnvironmentVariable("path","Machine") + ";$userPath"
     $driverFolderIsInPath = $true
+
     Remove-Item   $dest
 }
 
 
 #Install selenium Chrome driver
 try {
-   chromedriver --help | out-null
-   echo "The Selenium Chrome driver seems to be installed."
+    chromedriver --help | Out-null
+    echo "The Selenium Chrome driver is installed."
 } 
 catch {
-   echo "Selenium Chrome driver doesn't seem to be installed."
-   echo "Downloading Selenium Chrome driver ZIP..."
-   $source = $selChromeDriverURL
-   $Filename = [System.IO.Path]::GetFileName($source)
-   $dest = "c:\Temp\$Filename"
-   $wc = New-Object System.Net.WebClient
-   $wc.DownloadFile($source, $dest)
+    echo "Selenium Chrome driver doesn't seem to be installed."
+    echo "Downloading Selenium Chrome driver ZIP..."
+    $source = $selChromeDriverURL
+    $Filename = [System.IO.Path]::GetFileName($source)
+    $dest = "c:\Temp\$Filename"
+    $wc = New-Object System.Net.WebClient
+    $wc.DownloadFile($source, $dest)
 
-   if (!(Test-Path $selDriversFolder)) {
-      echo "Creating a folder for the Selenium drivers."
-      New-Item -ItemType directory -Path $selDriversFolder  | out-null
-   }
-   echo "Extracting Selenium Chrome driver to $selDriversFolder"
-   try {
-    unzip  $dest  $selDriversFolder | out-null
-    } catch {
-        echo "Warning! The unzip of $dest failed. Did the file already exist at $selDriversFolder?"
+    if (!(Test-Path $selDriversFolder)) {
+        echo "Creating a folder for the Selenium drivers."
+        New-Item -ItemType directory -Path $selDriversFolder  | Out-null
+    }
+    if(!(Test-Path "$selDriversFolder\chromedriver.exe")) {
+        echo "Extracting Selenium Chrome driver to $selDriversFolder"
+        unzip  $dest  $selDriversFolder | Out-Null  
     }
     if(! $driverFolderIsInPath) {
-    echo "Adding $selDriversFolder to path"
-    setx path "$userPath;$selDriversFolder"  | out-null
-    $userPath = [System.Environment]::GetEnvironmentVariable("path","User")
-    $env:path = [System.Environment]::GetEnvironmentVariable("path","Machine") + ";$userPath"
-    Remove-Item   $dest
+        echo "Adding $selDriversFolder to path"
+        setx path "$userPath;$selDriversFolder"  | Out-null
+        $userPath = [System.Environment]::GetEnvironmentVariable("path","User")
+        $env:path = [System.Environment]::GetEnvironmentVariable("path","Machine") + ";$userPath"
     }
+    Remove-Item   $dest  | Out-null
 }
 
-#TODO check wich browsers are available. Don't use IE (too unreliable).
-#Make a RF demonstration test
-echo "*Settings*
+#Writes a demo test script, if Firefox or Chrome are installed
+$demoBrowser = getDemoBrowser
+if($demoBrowser) {
+#Be carefull with the test indentation and spacing.
+    echo "*Settings*
 Library    Selenium2Library    15.0    5
 *Test Cases*
 Demo Test Case
-    Open Browser  	http://robotframework.org/   	Chrome" | Out-File -encoding utf8 c:\Temp\test.txt
-
+    Open Browser    http://robotframework.org/    $demoBrowser" | Out-File -encoding utf8 test.txt  | Out-null
+}
 
 
 #Install wxPython
@@ -384,21 +434,31 @@ else {
 #Install RIDE and open it
 try {
    echo "Trying to open RIDE..."
-   Start-Process ride.py
+   if($demoBrowser)  {
+        Start-Process ride.py  test.txt
+   } else {
+        Start-Process ride.py 
+   }
 } 
 catch {
    echo "RIDE doesn't seem to be installed"
    echo "Installing RIDE..."
-   pip install robotframework-ride   | out-null
+   pip install robotframework-ride   | Out-null
    echo "Opening RIDE..."
-   Start-Process ride.py   c:\Temp\test.txt
+   if($demoBrowser)  {
+        Start-Process ride.py  test.txt
+   } else {
+        Start-Process ride.py 
+   }
 }
 
-#TODO put report in specific folder
 
 #Run a sample test with pybot
-echo "Running a sample test..."
-pybot  c:\Temp\test.txt
+if($demoBrowser)  {
+    echo "Running a sample test..."
+    pybot  test.txt
+}
+
 
 <#
 if(Test-Path c:\Temp\report.html) {Invoke-Item c:\Temp\report.html}

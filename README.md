@@ -1,6 +1,6 @@
 .SYNOPSIS
 
-This Windows PowerShell script will download and install the Robot Framework, all it's required dependencies (if not already available) and some extra libraries and tools.
+This Windows PowerShell script will download and install the Robot Framework, all it's required dependencies (if not allready available) and some extra libraries and tools.
 If necessary, it will also modify the user 'path' environment variable, so to include the necessary folders.
 In the end of the process, the following resources should be installed:
 - Python (version 2.7.8 will be downloaded if no RF compatible version is already present).
@@ -33,10 +33,12 @@ Dependencies: Internet connectivity
               The 'setx' command
 
 
+
 .USAGE
 
 -Save this script into a file. Don't forget the .ps1 extension.
 -Right click the file and choose 'Run with PowerShell'.
+
 
 
 .DESCRIPTION
@@ -51,6 +53,7 @@ If it's present, it will assume that there's already a valid installation and ju
 If it can't find it, it will download a compatible python .msi installer and run it. Afterwards it will add it's location to 'path'.
 
 
+
 PIP Installation
 
 Starts by running the 'pip -V' command
@@ -59,10 +62,12 @@ If it's present, it will assume that there's already a valid installation and ju
 If it can't find it, it will download the installer and run it, afterwards it will add it's location to 'path'.
 
 
+
 Robot Framework Installation
 
 Starts by running the 'pybot --version' command
 If it fails, will install the robot framework using PIP
+
 
 
 Selenium2Library Installation
@@ -71,10 +76,22 @@ Starts by checking if the <python folder>\Lib\site-packages.\Selenium2Library fo
 If it fails, will install the selenium2libraryu using PIP.
 
 
+
+Selenium Drivers for Internet Explorer and Chrome
+
+Starts by running the --help command of the drivers.
+If it fails, downloads the .zip files with the drivers.
+If necessary, creates a folder to place the drivers.
+Unzips the drivers to that folder.
+Adds the folder to PATH
+
+ 
+ 
 wxPython Installation
 
-Starts by checking if the <python folder>\Lib\site-packages\wx-2.8-msw-unicode\wxPython folder exists
+Starts by checking if the <python folder>\Lib\site-packages\wx-2.8-msw-unicode\wxPython folder exists.
 If it fails, downloads the wxPython installer and runs it.
+
 
 
 RIDE Installation
@@ -84,7 +101,9 @@ If it fails, will install RIDE using PIP.
 Tries to open RIDE again.
 
 
+
 Demo Test
 
-Writes a test scrip on temporary .txt file.
-Runs the demo test script using pybot
+If Firefox or Chrome are installed, writes a demo test scrip on a .txt file.
+IE won't be used because of needed additional configurations.
+Runs the test script using pybot.
