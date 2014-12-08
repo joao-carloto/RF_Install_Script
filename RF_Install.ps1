@@ -37,8 +37,10 @@ Dependencies: Internet connectivity
 
 .USAGE
 
--Save this script into a file. Don't forget the .ps1 extension.
--Right click the file and choose 'Run with PowerShell'.
+- Download or copy/paste this script into a file. Don't forget the .ps1 extension.
+- Right click the file and choose 'Run with PowerShell'.
+- If script execution is disabled in you system, follow the instructions at 
+  http://www.tech-recipes.com/rx/6679/windows-7-enable-execution-of-windows-powershell-scripts/
 
 
 
@@ -111,94 +113,41 @@ Runs the test script using pybot.
 #>
 
 
+
 #Installer locations. Modify these if outdated.
 $pythonURL = "https://www.python.org/ftp/python/2.7.8/python-2.7.8.msi"
 $pipURL = "https://bootstrap.pypa.io/get-pip.py"
 $wxPythonURL = "https://log-parser.googlecode.com/files/wxPython2.8-win32-unicode-2.8.12.1-py27.exe"
-$selIEDriverURL = "http://selenium-release.storage.googleapis.com/2.44/IEDriverServer_Win32_2.44.0.zip"
 $selChromeDriverURL = "http://chromedriver.storage.googleapis.com/2.9/chromedriver_win32.zip"
 
-#The IE and Chrome selenium drivers will be placed here if not already installed. Folder is created if not existing. Added to path.
+#64Bits
+if (${env:programfiles(x86)}) { 
+    $selIEDriverURL = "http://selenium-release.storage.googleapis.com/2.44/IEDriverServer_x64_2.44.0.zip"
+#32 bits
+} else {
+    $selIEDriverURL = "http://selenium-release.storage.googleapis.com/2.44/IEDriverServer_Win32_2.44.0.zip"
+}
+
+#The IE and Chrome selenium drivers will be placed here if not already installed. Folder is created if not existing and added to path.
 #Change folder location if necessary.
 $selDriversFolder = "c:\Selenium Drivers"
 
 #We will modify the user 'path' environment variable, if necessary.
 $userPath = [System.Environment]::GetEnvironmentVariable("path","User")
 
-
 #To unzip the selenium drivers for IE and Chrome
-#Copied form http://poshcode.org/4845
-#The 'easy' examples on the net wouldn't work, check better later
-Add-Type -As System.IO.Compression.FileSystem
-function Expand-ZipFile {
-	#.Synopsis
-	#  Expand a zip file, ensuring it's contents go to a single folder ...
-	[CmdletBinding()]
-	param(
-		# The path of the zip file that needs to be extracted
-		[Parameter(ValueFromPipelineByPropertyName=$true, Position=0, Mandatory=$true)]
-		[Alias("PSPath")]
-		$FilePath,
- 
-		# The path where we want the output folder to end up
-		[Parameter(Position=1)]
-		$OutputPath = $Pwd,
- 
-		# Make sure the resulting folder is always named the same as the archive
-		[Switch]$Force
-	)
-	process {
-		$ZipFile = Get-Item $FilePath
-		$Archive = [System.IO.Compression.ZipFile]::Open( $ZipFile, "Read" )
- 
-		# Figure out where we'd prefer to end up
-		if(Test-Path $OutputPath) {
-			# If they pass a path that exists, we want to create a new folder
-			$Destination = Join-Path $OutputPath $ZipFile.BaseName
-		} else {
-			# Otherwise, since they passed a folder, they must want us to use it
-			$Destination = $OutputPath
-		}
- 
-		# The root folder of the first entry ...
-		$ArchiveRoot = ($Archive.Entries[0].FullName -Split "/|\\")[0]
- 
-		Write-Verbose "Desired Destination: $Destination"
-		Write-Verbose "Archive Root: $ArchiveRoot"
- 
-		# If any of the files are not in the same root folder ...
-		if($Archive.Entries.FullName | Where-Object { @($_ -Split "/|\\")[0] -ne $ArchiveRoot }) {
-			# extract it into a new folder:
-			New-Item $Destination -Type Directory -Force
-			[System.IO.Compression.ZipFileExtensions]::ExtractToDirectory( $Archive, $Destination )
-		} else {
-			# otherwise, extract it to the OutputPath
-			[System.IO.Compression.ZipFileExtensions]::ExtractToDirectory( $Archive, $OutputPath )
- 
-			# If there was only a single file in the archive, then we'll just output that file...
-			if($Archive.Entries.Count -eq 1) {
-				# Except, if they asked for an OutputPath with an extension on it, we'll rename the file to that ...
-				if([System.IO.Path]::GetExtension($Destination)) {
-					Move-Item (Join-Path $OutputPath $Archive.Entries[0].FullName) $Destination 
-				} else {
-					Get-Item (Join-Path $OutputPath $Archive.Entries[0].FullName)
-				}
-			} elseif($Force) {
-				# Otherwise let's make sure that we move it to where we expect it to go, in case the zip's been renamed
-				if($ArchiveRoot -ne $ZipFile.BaseName) {
-					Move-Item (join-path $OutputPath $ArchiveRoot) $Destination
-					Get-Item $Destination
-				}
-			} else {
-				Get-Item (Join-Path $OutputPath $ArchiveRoot)
-			}
-		}
- 
-		$Archive.Dispose()
-	}
+function Expand-ZIPFile($file, $destination)
+    {
+        $shell = new-object -com shell.application
+        $zip = $shell.NameSpace($file)
+        foreach($item in $zip.items())
+        {
+            $shell.Namespace($destination).copyhere($item)
+        }
 }
 # Add the alias
 new-alias unzip expand-zipfile
+
 
 function getDemoBrowser {
 	#.Synopsis
@@ -226,11 +175,33 @@ function getDemoBrowser {
        $browser = "Chrome"
        return  $browser
     }
+
     return     $false
 }
 
 
 #THE REAL WORK STARTS HERE
+
+try {
+    setx /? | Out-null
+} catch { 
+    echo "The 'setx' command doesn't seem to be available"
+    if(Test-Path c:\Windows\System32\setx.exe) {
+        echo "setx.exe is available at c:\Windows\System32"
+        echo "We'll add c:\Windows\System32 to the Path environment variable"
+        c:\Windows\System32\setx.exe   path "$userPath;c:\Windows\System32"  | Out-Null
+        $userPath = [System.Environment]::GetEnvironmentVariable("path","User")
+        $env:path = [System.Environment]::GetEnvironmentVariable("path","Machine") + ";$userPath"
+    } else {
+        echo "WARNING! The setx command doesn't seem to ba available in you system."
+        echo "It's not available by default in Windows XP or previous, unless it's installed from the Service Pack 2 Support Tools."
+        echo "Without it, we cannot update the Path environment variable."
+        echo "We will now quit this script"
+        Read-Host 'Press Enter to close...' | Out-Null
+        exit  
+    }
+}
+
 
 #Install Python
 try {
@@ -242,12 +213,12 @@ try {
         pause
         Exit 
     } else {
-      echo  "A Python version ($pythonVersion) compatible with Robot Framework is already installed"
+      echo  "A Python version compatible with the Robot Framework is already installed: $pythonVersion"
       $env:path -match "([^;]*\\python2[567])([^\\]|$)" | Out-null
       $pythonPath = $matches[1]
     }
 } catch  {
-    echo "Could not get the local python version"
+    echo "Could not get the local Python version"
     if (Test-Path "c:\python27\python.exe" -PathType Any) {
         $pythonPath = "c:\python27"
     } elseif (Test-Path "c:\python26\python.exe" -PathType Any) {
@@ -255,13 +226,12 @@ try {
     } elseif (Test-Path "c:\python25\python.exe" -PathType Any) {
         $pythonPath = "c:\python25"
     } 
-
     if ($pythonPath) {
-        echo  "A valid python installation seems to exist in the default location ($pythonPath)"
+        echo  "A valid Python installation seems to exist in the default location ($pythonPath)"
         echo  "We'll just add it to the PATH environment variable..."
     } else {
-        echo "Could not find a python installation on the root of the c:\ drive"
-        echo "Downloading the python 2.7.8 installer..."
+        echo "Could not find a compatible Python installation on the root of the c:\ drive"
+        echo "Downloading the Python 2.7.8 installer..."
         $source = $pythonURL
         $Filename = [System.IO.Path]::GetFileName($source)
         $dest = "C:\Temp\$Filename"
@@ -284,7 +254,7 @@ try {
 try {$pipVersion = pip -V
     echo "PIP is installed with version: $pipVersion" 
 } catch {
-    echo "Unable to get PIP version"
+    echo "Unable to get the local PIP version"
     $pipExists = Test-Path "$pythonPath\Scripts\pip.exe" -PathType Any
     if($pipExists) {
         echo  "PIP seems to be installed although not included in the PATH environment variable"
@@ -332,9 +302,12 @@ else {
 }
 
 
-#Install selenium IE driver
+#Install Selenium IE driver
 try {
-   IEDriverServer --help | Out-null
+   #Old versions don't support the --help flag
+   #IEDriverServer --help 
+   Start-Process -NoNewWindow IEDriverServer
+   Stop-Process -processname IEDriverServer
    echo "The Selenium IE driver is installed."
 } 
 catch {
@@ -351,12 +324,8 @@ catch {
         New-Item -ItemType directory -Path $selDriversFolder  | Out-null
     }
     if(!(Test-Path "$selDriversFolder\IEDriverServer.exe")) {
-        echo "Extracting Selenium IE driver to $selDriversFolder"
+        echo "Unziping the Selenium IE driver to $selDriversFolder"
         unzip  $dest  $selDriversFolder | Out-null
-        #By some reson this does not end up with the correct name the first time we try to unzip it. Doesn't happen with chrome driver. Check better solution later.
-        if(Test-Path "$selDriversFolder\IEDriverServer_Win32_2.44.0") {
-            Rename-Item "$selDriversFolder\IEDriverServer_Win32_2.44.0" IEDriverServer.exe
-        }
     }
     echo "Adding $selDriversFolder to path"
     setx path "$userPath;$selDriversFolder"   | Out-null
@@ -368,7 +337,7 @@ catch {
 }
 
 
-#Install selenium Chrome driver
+#Install Selenium Chrome driver
 try {
     chromedriver --help | Out-null
     echo "The Selenium Chrome driver is installed."
@@ -387,8 +356,8 @@ catch {
         New-Item -ItemType directory -Path $selDriversFolder  | Out-null
     }
     if(!(Test-Path "$selDriversFolder\chromedriver.exe")) {
-        echo "Extracting Selenium Chrome driver to $selDriversFolder"
-        unzip  $dest  $selDriversFolder | Out-Null  
+        echo "Unziping the Selenium Chrome driver to $selDriversFolder"
+        unzip  $dest  $selDriversFolder  | Out-null
     }
     if(! $driverFolderIsInPath) {
         echo "Adding $selDriversFolder to path"
@@ -399,6 +368,7 @@ catch {
     Remove-Item   $dest  | Out-null
 }
 
+
 #Writes a demo test script, if Firefox or Chrome are installed
 $demoBrowser = getDemoBrowser
 if($demoBrowser) {
@@ -407,7 +377,7 @@ if($demoBrowser) {
 Library    Selenium2Library    15.0    5
 *Test Cases*
 Demo Test Case
-    Open Browser    http://robotframework.org/    $demoBrowser" | Out-File -encoding utf8 test.txt  | Out-null
+    Open Browser    http://robotframework.org/    $demoBrowser" | Out-File -encoding utf8 c:\Temp\test.txt  | Out-null
 }
 
 
@@ -435,7 +405,7 @@ else {
 try {
    echo "Trying to open RIDE..."
    if($demoBrowser)  {
-        Start-Process ride.py  test.txt
+        Start-Process ride.py  c:\Temp\test.txt
    } else {
         Start-Process ride.py 
    }
@@ -446,7 +416,7 @@ catch {
    pip install robotframework-ride   | Out-null
    echo "Opening RIDE..."
    if($demoBrowser)  {
-        Start-Process ride.py  test.txt
+        Start-Process ride.py  c:\Temp\test.txt
    } else {
         Start-Process ride.py 
    }
@@ -456,18 +426,11 @@ catch {
 #Run a sample test with pybot
 if($demoBrowser)  {
     echo "Running a sample test..."
-    pybot  test.txt
+    pybot -d c:\Temp  c:\Temp\test.txt  
 }
 
 
-<#
-if(Test-Path c:\Temp\report.html) {Invoke-Item c:\Temp\report.html}
-
-if(Test-Path c:\Temp\report.html) {Remove-Item   c:\Temp\report.html  | out-null}
-if(Test-Path c:\Temp\log.html) {Remove-Item   c:\Temp\log.html   | out-null}
-if(Test-Path c:\Temp\test.txt) { Remove-Item   c:\Temp\test.txt  | out-null}
-#>
-
 echo "Everything is concluded"
-pause
 
+#A simple 'pause' doesn't work on older versions of PS
+Read-Host 'Press Enter to close this shell...' | Out-Null
