@@ -1,7 +1,8 @@
 <#
 .SYNOPSIS
 
-This Windows PowerShell script will download and install the Robot Framework, all it's required dependencies (if not allready available) and some extra libraries and tools.
+This Windows PowerShell script will download and install the Robot Framework, all it's required dependencies 
+(if not allready available) and some extra libraries and tools.
 If necessary, it will also modify the user 'path' environment variable, so to include the necessary folders.
 In the end of the process, the following resources should be installed:
 - Python (version 2.7.8 will be downloaded if no RF compatible version is already present).
@@ -23,7 +24,8 @@ IMPORTANT! The installer download locations were valid at the time of this scrip
 If you find some invalid URL please report an issue at https://github.com/joao-carloto/RF_Install_Script/issues
 
 IMPORTANT! If you really want to do selenium tests on IE, beware that there are some necessary browser configurations to be made.
-This script doesn't deal with those. For more info check https://code.google.com/p/selenium/wiki/InternetExplorerDriver#Required_Configuration
+This script doesn't deal with those. 
+For more info check https://code.google.com/p/selenium/wiki/InternetExplorerDriver#Required_Configuration
 
 Script: RF_Installer.ps1
 Author: João Carloto, Twitter: @JMCarloto
@@ -50,7 +52,8 @@ Python Installation
 
 Starts by running the 'python -V' command
 If a compatible version is found (2.5, 2.6 or 2.7) it will read the path environment variable to get it's location and store it.
-If an incompatible version is found, it will show a warning to remove it from the PATH environment variable or rename python.exe to something else (e.g. python3.exe) and rerun this script.
+If an incompatible version is found, it will show a warning to remove it from the PATH environment variable 
+or rename python.exe to something else (e.g. python3.exe) and rerun this script.
 If the 'python -V' command fails it will search for python.exe in it's standard locations (e.g. c:\python27\).
 If it's present, it will assume that there's already a valid installation and just add it's location to 'path'.
 If it can't find it, it will download a compatible python .msi installer and run it. Afterwards it will add it's location to 'path'.
@@ -128,7 +131,8 @@ if (${env:programfiles(x86)}) {
     $selIEDriverURL = "http://selenium-release.storage.googleapis.com/2.44/IEDriverServer_Win32_2.44.0.zip"
 }
 
-#The IE and Chrome selenium drivers will be placed here if not already installed. Folder is created if not existing and added to path.
+#The IE and Chrome selenium drivers will be placed here if not already installed. 
+#Folder is created if not existing and added to path.
 #Change folder location if necessary.
 $selDriversFolder = "c:\Selenium Drivers"
 
@@ -374,10 +378,14 @@ $demoBrowser = getDemoBrowser
 if($demoBrowser) {
 #Be carefull with the test indentation and spacing.
     echo "*Settings*
-Library    Selenium2Library    15.0    5
-*Test Cases*
-Demo Test Case
-    Open Browser    http://robotframework.org/    $demoBrowser" | Out-File -encoding utf8 c:\Temp\test.txt  | Out-null
+Documentation	     Test suite created with FireRobot.
+Library	   Selenium2Library   15.0   5.0
+*Test Cases *
+FireRobot Test Case
+    Open Browser  	http://joao-carloto.github.io/RF_Install_Script/test.html   	$demoBrowser
+    Page Should Contain   	RF Install Script Test Page
+    Input Text   	sometextbox   	Congratulations!
+    Input Text   	sometextarea    If you are reading this, you have completed your Robot Framework setup.\n\nTo run this test again on RIDE, click on the 'Run Tests' button or press F8.\n\nTo learn more about the immense possibilities of the Robot Framework go to http://robotframework.org/." | Out-File -encoding utf8 c:\Temp\test.txt | Out-null
 }
 
 
