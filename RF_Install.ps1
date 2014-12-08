@@ -378,7 +378,7 @@ FireRobot Test Case
     Open Browser  	http://joao-carloto.github.io/RF_Install_Script/test.html   	$demoBrowser
     Page Should Contain   	RF Install Script Test Page
     Input Text   	sometextbox   	Congratulations!
-    Input Text   	sometextarea    If you are reading this, you have completed your Robot Framework setup.\n\nTo run this test again on RIDE, click on the 'Run Tests' button or press F8.\n\nTo learn more about the immense possibilities of the Robot Framework go to http://robotframework.org/." | Out-File -encoding utf8 c:\Temp\test.txt | Out-null
+    Input Text   	sometextarea    If you are reading this, you have completed your Robot Framework setup.\n\nTo run this test again on RIDE, click on the 'Run Tests' button.\n\nTo learn more about the immense possibilities of the Robot Framework go to http://robotframework.org/." | Out-File -encoding utf8 c:\Temp\test.txt | Out-null
 }
 
 
