@@ -24,7 +24,7 @@ If you find some invalid URL please report an issue at https://github.com/joao-c
 IMPORTANT! If you really want to do selenium tests on IE, beware that there are some necessary browser configurations to be made.
 This script doesn't deal with those. For more info check https://code.google.com/p/selenium/wiki/InternetExplorerDriver#Required_Configuration
 
-
+<br>
 Script: RF_Installer.ps1
 
 Author: João Carloto, Twitter: @JMCarloto
@@ -35,12 +35,10 @@ License: Apache 2.0
 
 Version: 0.1
 
-Dependencies: Internet connectivity
-
-              The 'setx' command
+Dependencies: Internet connectivity, the 'setx' command
 
 
-
+<br>
 .USAGE
 
 - Save this script into a file. Don't forget the .ps1 extension.
@@ -48,7 +46,7 @@ Dependencies: Internet connectivity
 - If script execution is disabled in you system, follow the instructions at http://www.tech-recipes.com/rx/6679/windows-7-enable-execution-of-windows-powershell-scripts/
 
 
-
+<br>
 .DESCRIPTION
 
 Python Installation
@@ -61,7 +59,7 @@ If it's present, it will assume that there's already a valid installation and ju
 If it can't find it, it will download a compatible python .msi installer and run it. Afterwards it will add it's location to 'path'.
 
 
-
+<br>
 PIP Installation
 
 Starts by running the 'pip -V' command
@@ -70,21 +68,21 @@ If it's present, it will assume that there's already a valid installation and ju
 If it can't find it, it will download the installer and run it, afterwards it will add it's location to 'path'.
 
 
-
+<br>
 Robot Framework Installation
 
 Starts by running the 'pybot --version' command
 If it fails, will install the robot framework using PIP
 
 
-
+<br>
 Selenium2Library Installation
 
 Starts by checking if the <python folder>\Lib\site-packages.\Selenium2Library folder exists.
 If it fails, will install the selenium2libraryu using PIP.
 
 
-
+<br>
 Selenium Drivers for Internet Explorer and Chrome
 
 Starts by running the --help command of the drivers.
@@ -93,15 +91,15 @@ If necessary, creates a folder to place the drivers.
 Unzips the drivers to that folder.
 Adds the folder to PATH
 
- 
- 
+
+<br> 
 wxPython Installation
 
 Starts by checking if the <python folder>\Lib\site-packages\wx-2.8-msw-unicode\wxPython folder exists.
 If it fails, downloads the wxPython installer and runs it.
 
 
-
+<br>
 RIDE Installation
 
 Starts by running the 'ride.py' command, to open the RIDE GUI.
@@ -109,7 +107,7 @@ If it fails, will install RIDE using PIP.
 Tries to open RIDE again.
 
 
-
+<br>
 Demo Test
 
 If Firefox or Chrome are installed, writes a demo test scrip on a .txt file.
