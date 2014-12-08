@@ -24,20 +24,28 @@ If you find some invalid URL please report an issue at https://github.com/joao-c
 IMPORTANT! If you really want to do selenium tests on IE, beware that there are some necessary browser configurations to be made.
 This script doesn't deal with those. For more info check https://code.google.com/p/selenium/wiki/InternetExplorerDriver#Required_Configuration
 
+
 Script: RF_Installer.ps1
+
 Author: João Carloto, Twitter: @JMCarloto
+
 Github repo: https://github.com/joao-carloto/RF_Install_Script
+
 License: Apache 2.0
+
 Version: 0.1
+
 Dependencies: Internet connectivity
+
               The 'setx' command
 
 
 
 .USAGE
 
--Save this script into a file. Don't forget the .ps1 extension.
--Right click the file and choose 'Run with PowerShell'.
+- Save this script into a file. Don't forget the .ps1 extension.
+- Right click the file and choose 'Run with PowerShell'.
+- If script execution is disabled in you system, follow the instructions at http://www.tech-recipes.com/rx/6679/windows-7-enable-execution-of-windows-powershell-scripts/
 
 
 

@@ -59,7 +59,6 @@ If it's present, it will assume that there's already a valid installation and ju
 If it can't find it, it will download a compatible python .msi installer and run it. Afterwards it will add it's location to 'path'.
 
 
-
 PIP Installation
 
 Starts by running the 'pip -V' command
@@ -68,19 +67,16 @@ If it's present, it will assume that there's already a valid installation and ju
 If it can't find it, it will download the installer and run it, afterwards it will add it's location to 'path'.
 
 
-
 Robot Framework Installation
 
 Starts by running the 'pybot --version' command
 If it fails, will install the robot framework using PIP
 
 
-
 Selenium2Library Installation
 
 Starts by checking if the <python folder>\Lib\site-packages.\Selenium2Library folder exists.
 If it fails, will install the selenium2libraryu using PIP.
-
 
 
 Selenium Drivers for Internet Explorer and Chrome
@@ -92,12 +88,10 @@ Unzips the drivers to that folder.
 Adds the folder to PATH
 
  
- 
 wxPython Installation
 
 Starts by checking if the <python folder>\Lib\site-packages\wx-2.8-msw-unicode\wxPython folder exists.
 If it fails, downloads the wxPython installer and runs it.
-
 
 
 RIDE Installation
@@ -105,7 +99,6 @@ RIDE Installation
 Starts by running the 'ride.py' command, to open the RIDE GUI.
 If it fails, will install RIDE using PIP.
 Tries to open RIDE again.
-
 
 
 Demo Test
@@ -288,7 +281,7 @@ try {
     $RFVersion = pybot --version
     echo "Robot Framework is installed with version: $RFVersion"
 } catch {
-    echo "Unable to get the Robot Framework version"
+    echo "Unable to get the local Robot Framework version"
     echo "Installing RobotFramework..."
     pip install robotframework  | Out-null
 }
