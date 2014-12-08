@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="RF Install Script : Robot Framework installation and configuration script, including dependencies, toolls, libs and drivers">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>RF Install Script</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/joao-carloto/RF_Install_Script">View on GitHub</a>
+
+          <h1 id="project_title">RF Install Script</h1>
+          <h2 id="project_tagline">Robot Framework installation and configuration script, including dependencies, toolls, libs and drivers</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/joao-carloto/RF_Install_Script/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/joao-carloto/RF_Install_Script/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h3>
+<a id="synopsis" class="anchor" href="#synopsis" aria-hidden="true"><span class="octicon octicon-link"></span></a>SYNOPSIS</h3>
+
+<p>This Windows PowerShell script will download and install the Robot Framework, all it's required dependencies 
+(if not allready available) and some extra libraries and tools.
+If necessary, it will also modify the user 'Path' environment variable, so to include the necessary folders.</p>
+
+<p>In the end of the process, the following resources should be installed:</p>
+
+<ul>
+<li>Python (version 2.7.8 will be downloaded if no RF compatible version is already present).</li>
+<li>PIP (used to install RF, Selenium2library and RIDE)</li>
+<li>Robot Framework</li>
+<li>Selenium2library</li>
+<li>Selenium driver for Internet Explorer</li>
+<li>Selenium driver for Chrome </li>
+<li>wxPython (version 2.8.12.1, necessary to run RIDE)</li>
+<li>RIDE</li>
+</ul>
+
+<p>The only part of the script that's not fully automatic is the wxPython installation. You'll still have to go thru the wizard.
+If you are not interested in using RIDE, just comment that part of the script along with wxPython.</p>
+
+<p>IMPORTANT! This script uses the 'setx' command to modify the PATH user variable. This means it won't work in Windows XP or previous, unless it's installed from the Service Pack 2 Support Tools.</p>
+
+<p>IMPORTANT! The installer download locations were valid at the time of this scrip conception, but these may change. If you find some invalid URL please report an issue at <a href="https://github.com/joao-carloto/RF_Install_Script/issues">https://github.com/joao-carloto/RF_Install_Script/issues</a></p>
+
+<p>IMPORTANT! If you really want to do selenium tests on IE, beware that there are some necessary browser configurations to be made. This script doesn't deal with those. For more info check <a href="https://code.google.com/p/selenium/wiki/InternetExplorerDriver#Required_Configuration">https://code.google.com/p/selenium/wiki/InternetExplorerDriver#Required_Configuration</a></p>
+
+<h3>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>USAGE</h3>
+
+<ul>
+<li>Download or copy/paste this script into a file. Don't forget the .ps1 extension.</li>
+<li>Right click the file and choose 'Run with PowerShell'.</li>
+<li>If script execution is disabled in you system, follow the instructions at <a href="http://www.tech-recipes.com/rx/6679/windows-7-enable-execution-of-windows-powershell-scripts/">http://www.tech-recipes.com/rx/6679/windows-7-enable-execution-of-windows-powershell-scripts/</a>
+</li>
+</ul>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">RF Install Script maintained by <a href="https://github.com/joao-carloto">joao-carloto</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
