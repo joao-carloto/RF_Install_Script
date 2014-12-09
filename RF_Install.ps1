@@ -2,8 +2,8 @@
 .SYNOPSIS
 
 This Windows PowerShell script will download and install the Robot Framework, all it's required dependencies 
-(if not allready available) and some extra libraries and tools.
-If necessary, it will also modify the user 'path' environment variable, so to include the necessary folders.
+(if not already available) and some extra libraries and tools.
+If necessary, it will also modify the user 'Path' environment variable, so to include the necessary folders.
 In the end of the process, the following resources should be installed:
 - Python (version 2.7.8 will be downloaded if no RF compatible version is already present).
 - PIP (used to install RF, Selenium2library and RIDE)
@@ -21,7 +21,7 @@ IMPORTANT! This script uses the 'setx' command to modify the PATH user variable.
 This means it won't work in Windows XP or previous, unless it's installed from the Service Pack 2 Support Tools.
 
 IMPORTANT! The installer download locations were valid at the time of this scrip conception, but these may change. 
-If you find some invalid URL please report an issue at https://github.com/joao-carloto/RF_Install_Script/issues
+If you find some invalid URL, please report an issue at https://github.com/joao-carloto/RF_Install_Script/issues
 
 IMPORTANT! If you really want to do selenium tests on IE, beware that there are some necessary browser configurations to be made.
 This script doesn't deal with those. 
@@ -54,7 +54,7 @@ Starts by running the 'python -V' command
 If a compatible version is found (2.5, 2.6 or 2.7) it will read the path environment variable to get it's location and store it.
 If an incompatible version is found, it will show a warning to remove it from the PATH environment variable 
 or rename python.exe to something else (e.g. python3.exe) and rerun this script.
-If the 'python -V' command fails it will search for python.exe in it's standard locations (e.g. c:\python27\).
+If the 'python -V' command fails, it will search for python.exe in it's standard locations (e.g. c:\python27\).
 If it's present, it will assume that there's already a valid installation and just add it's location to 'path'.
 If it can't find it, it will download a compatible python .msi installer and run it. Afterwards it will add it's location to 'path'.
 
@@ -109,7 +109,6 @@ Runs the test script using pybot.
 #>
 
 
-
 #Installer locations. Modify these if outdated.
 $pythonURL = "https://www.python.org/ftp/python/2.7.8/python-2.7.8.msi"
 $pipURL = "https://bootstrap.pypa.io/get-pip.py"
@@ -145,39 +144,33 @@ function Expand-ZIPFile($file, $destination)
 # Add the alias
 new-alias unzip expand-zipfile
 
-
+#TODO is this reliable? Is there a better option?
+#Checks if Firefox or Chrome are installed to do a demo test run
+#Won't return IE due to the need of additional configurations
+$firefoxPath = $env:LOCALAPPDATA + "\Mozilla\Firefox"
+$chromePath = $env:LOCALAPPDATA + "\Google\Chrome"
 function getDemoBrowser {
-	#.Synopsis
-	#  Check if Firefox or Chrome are installed to do a demo test run
-    #  Won't return IE due to the need of additional configurations
-
-    #Check if Firefox is installed
-    if (${env:programfiles(x86)}) {
-         $firefox_path = join-path "${env:programfiles(x86)}" "Mozilla Firefox\firefox.exe" 
-    } else { 
-        $firefox_path = join-path "${env:programfiles}" "Mozilla Firefox\firefox.exe" 
-    }
-    if (test-path $firefox_path) {
+    # Check if Firefox is installed
+    if(Test-Path $firefoxPath -PathType Container) { 
        $browser = "Firefox"
        return  $browser
-    } 
-
-    #Check if Chrome is installed
-    if (${env:programfiles(x86)}){ 
-        $firefox_path = join-path "${env:programfiles(x86)}" "Google\Chrome\Application\chrome.exe" 
-    } else {
-        $firefox_path = join-path "${env:programfiles}" "Google\Chrome\Application\chrome.exe" 
     }
-    if (test-path $firefox_path) {
+    # Check if Chrome is installed
+    if(Test-Path $chromePath -PathType Container) {
        $browser = "Chrome"
        return  $browser
     }
-
     return     $false
 }
 
 
 #THE REAL WORK STARTS HERE
+
+#The Temp folder will be used to download the installers and run the demo test
+#All installers will be removed when not longer necessary
+if(! (Test-Path "c:\Temp" -PathType Container)) {
+    New-Item c:\Temp -type directory  | Out-Null
+}
 
 try {
     setx /? | Out-null
@@ -368,13 +361,15 @@ catch {
 
 #Writes a demo test script, if Firefox or Chrome are installed
 $demoBrowser = getDemoBrowser
+$demoBrowser
+
 if($demoBrowser) {
 #Be carefull with the test indentation and spacing.
     echo "*Settings*
 Documentation	     Test suite created with FireRobot.
 Library	   Selenium2Library   15.0   5.0
 *Test Cases *
-FireRobot Test Case
+EA Installer Demo Test
     Open Browser  	http://joao-carloto.github.io/RF_Install_Script/test.html   	$demoBrowser
     Page Should Contain   	RF Install Script Test Page
     Input Text   	sometextbox   	Congratulations!

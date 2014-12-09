@@ -1,6 +1,6 @@
 .SYNOPSIS
 
-This Windows PowerShell script will download and install the Robot Framework, all it's required dependencies (if not allready available) and some extra libraries and tools.
+This Windows PowerShell script will download and install the Robot Framework, all it's required dependencies (if not already available) and some extra libraries and tools.
 If necessary, it will also modify the user 'path' environment variable, so to include the necessary folders.
 In the end of the process, the following resources should be installed:
 - Python (version 2.7.8 will be downloaded if no RF compatible version is already present).
