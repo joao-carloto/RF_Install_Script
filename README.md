@@ -41,7 +41,7 @@ Dependencies: Internet connectivity, the 'setx' command
 <br>
 .USAGE
 
-- Save this script into a file. Don't forget the .ps1 extension.
+- Download or copy/paste the script into a file. Don't forget the .ps1 extension.
 - Right click the file and choose 'Run with PowerShell'.
 - If script execution is disabled in you system, follow the instructions at http://www.tech-recipes.com/rx/6679/windows-7-enable-execution-of-windows-powershell-scripts/
 
