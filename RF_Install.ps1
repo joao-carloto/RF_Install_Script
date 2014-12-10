@@ -237,7 +237,7 @@ try {
         Start-Process $dest  /qn -Wait
         Remove-Item   $dest
         $pythonPath = "c:\python27"
-        echo "Adding the python folder to the PATH environment variable..."
+        echo "Adding the Python folder to the PATH environment variable..."
     }
     #This is th user path not the system
     setx path "$userPath;$pythonPath"   | Out-null
