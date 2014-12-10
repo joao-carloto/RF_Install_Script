@@ -3,7 +3,7 @@
 This Windows PowerShell script will download and install the Robot Framework, all it's required dependencies (if not already available) and some extra libraries and tools.
 If necessary, it will also modify the user 'path' environment variable, so to include the necessary folders.
 In the end of the process, the following resources should be installed:
-- Python (version 2.7.8 will be downloaded if no RF compatible version is already present).
+- Python 2.7.x
 - PIP (used to install RF, Selenium2library and RIDE)
 - Robot Framework
 - Selenium2library
@@ -52,9 +52,10 @@ Dependencies: Internet connectivity, the 'setx' command
 Python Installation
 
 Starts by running the 'python -V' command
-If a compatible version is found (2.5, 2.6 or 2.7) it will read the path environment variable to get it's location and store it.
+If a compatible version is found (2.7.x) it will read the path environment variable to get it's location and store it.
+Python 2.5 and 2.6 are supposed to be compatible with RF, but they would not be OK for the PIP and wxPython versions we are using.
 If an incompatible version is found, it will show a warning to remove it from the PATH environment variable or rename python.exe to something else (e.g. python3.exe) and rerun this script.
-If the 'python -V' command fails it will search for python.exe in it's standard locations (e.g. c:\python27\).
+If the 'python -V' command fails it will search for python.exe in it's standard location (c:\python27\).
 If it's present, it will assume that there's already a valid installation and just add it's location to 'path'.
 If it can't find it, it will download a compatible python .msi installer and run it. Afterwards it will add it's location to 'path'.
 

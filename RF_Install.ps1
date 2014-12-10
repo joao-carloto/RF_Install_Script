@@ -5,7 +5,7 @@ This Windows PowerShell script will download and install the Robot Framework, al
 (if not already available) and some extra libraries and tools.
 If necessary, it will also modify the user 'Path' environment variable, so to include the necessary folders.
 In the end of the process, the following resources should be installed:
-- Python (version 2.7.8 will be downloaded if no RF compatible version is already present).
+- Python 2.7.x
 - PIP (used to install RF, Selenium2library and RIDE)
 - Robot Framework
 - Selenium2library
@@ -51,10 +51,11 @@ Dependencies: Internet connectivity
 Python Installation
 
 Starts by running the 'python -V' command
-If a compatible version is found (2.5, 2.6 or 2.7) it will read the path environment variable to get it's location and store it.
+If a compatible version is found (2.7.x) it will read the path environment variable to get it's location and store it.
+Python 2.5 and 2.6 are supposed to be compatible with RF, but they would not be OK for the PIP and wxPython versions we are using.
 If an incompatible version is found, it will show a warning to remove it from the PATH environment variable 
 or rename python.exe to something else (e.g. python3.exe) and rerun this script.
-If the 'python -V' command fails, it will search for python.exe in it's standard locations (e.g. c:\python27\).
+If the 'python -V' command fails, it will search for python.exe in it's standard location (c:\python27\).
 If it's present, it will assume that there's already a valid installation and just add it's location to 'path'.
 If it can't find it, it will download a compatible python .msi installer and run it. Afterwards it will add it's location to 'path'.
 
@@ -196,9 +197,11 @@ try {
 #Install Python
 try {
     $pythonVersion = python -V 2>&1
-    $pythonVersion = [String]$pythonVersion 
-    if (![Regex]::IsMatch($pythonVersion,"Python 2\.[567]")) {
-        echo "The active Python version ($pythonVersion) is incompatible with the Robot Framework
+    $pythonVersion = [String]$pythonVersion
+    #Python 2.5 and 2.6 are supposed to be compatible with RF, but they would not be OK for the PIP and wxPython versions we are using. 
+    #if (![Regex]::IsMatch($pythonVersion,"Python 2\.[567]")) {
+    if (![Regex]::IsMatch($pythonVersion,"Python 2\.7")) {
+        echo "The active Python version ($pythonVersion) is incompatible with the Robot Framework and/or other tools we are installing.
         Please remove it from the PATH environment variable or rename python.exe to something else (e.g. python3.exe) and rerun this script"
         pause
         Exit 
@@ -211,11 +214,14 @@ try {
     echo "Could not get the local Python version"
     if (Test-Path "c:\python27\python.exe" -PathType Any) {
         $pythonPath = "c:\python27"
-    } elseif (Test-Path "c:\python26\python.exe" -PathType Any) {
+    } 
+    <#
+    elseif (Test-Path "c:\python26\python.exe" -PathType Any) {
         $pythonPath = "c:\python26"
     } elseif (Test-Path "c:\python25\python.exe" -PathType Any) {
         $pythonPath = "c:\python25"
     } 
+    #>
     if ($pythonPath) {
         echo  "A valid Python installation seems to exist in the default location ($pythonPath)"
         echo  "We'll just add it to the PATH environment variable..."
@@ -275,7 +281,7 @@ try {
     echo "Robot Framework is installed with version: $RFVersion"
 } catch {
     echo "Unable to get the local Robot Framework version"
-    echo "Installing RobotFramework..."
+    echo "Installing the RobotFramework..."
     pip install robotframework  | Out-null
 }
 
@@ -361,7 +367,6 @@ catch {
 
 #Writes a demo test script, if Firefox or Chrome are installed
 $demoBrowser = getDemoBrowser
-$demoBrowser
 
 if($demoBrowser) {
 #Be carefull with the test indentation and spacing.
