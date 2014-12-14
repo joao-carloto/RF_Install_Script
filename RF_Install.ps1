@@ -204,9 +204,9 @@ try {
         $userPath = [System.Environment]::GetEnvironmentVariable("path","User")
         $env:path = [System.Environment]::GetEnvironmentVariable("path","Machine") + ";$userPath"
     } else {
-        echo "WARNING! The setx command doesn't seem to be available in you system."
-        echo "It's not available by default in Windows XP or previous, unless it's installed from the Service Pack 2 Support Tools."
-        echo "Without it, we cannot update the PATH environment variable."
+        echo "WARNING! The setx command doesn't seem to be available in you system"
+        echo "It's not available by default in Windows XP or previous, unless it's installed from the Service Pack 2 Support Tools"
+        echo "Without it, we cannot update the PATH environment variable"
         echo "We will now quit this script"
         Read-Host 'Press Enter to close...' | Out-Null
         exit  
@@ -221,7 +221,7 @@ try {
     #Python 2.5 and 2.6 are supposed to be compatible with RF, but they would not be OK for the PIP and wxPython versions we are using. 
     #if (![Regex]::IsMatch($pythonVersion,"Python 2\.[567]")) {
     if (![Regex]::IsMatch($pythonVersion,"Python 2\.7")) {
-        echo "The active Python version ($pythonVersion) is incompatible with the Robot Framework and/or other tools we are installing.
+        echo "The active Python version ($pythonVersion) is incompatible with the Robot Framework and/or other tools we are installing
         Please remove it from the PATH environment variable or rename python.exe to something else (e.g. python3.exe) and rerun this script"
         pause
         Exit 
@@ -311,7 +311,7 @@ try {
 #Install the Selenium2library
 $seleniumFolderExists = Test-Path "$pythonPath\Lib\site-packages\Selenium2Library" -PathType Any
 if($seleniumFolderExists) {
-    echo  "The Selenium2library seems to be installed."
+    echo  "The Selenium2library seems to be installed"
     echo "Checking if the The Selenium2library is up to date..."
     checkUpdates("robotframework-selenium2library")
     }
@@ -331,7 +331,7 @@ try {
    echo "The Selenium IE driver is installed."
 } 
 catch {
-    echo "Selenium IE driver doesn't seem to be installed."
+    echo "Selenium IE driver doesn't seem to be installed"
     echo "Downloading Selenium IE driver ZIP..."
     $source = $selIEDriverURL
     $Filename = [System.IO.Path]::GetFileName($source)
@@ -340,7 +340,7 @@ catch {
     $wc.DownloadFile($source, $dest)
 
     if (!(Test-Path $selDriversFolder)) {
-        echo "Creating a folder for the Selenium drivers."
+        echo "Creating a folder for the Selenium drivers"
         New-Item -ItemType directory -Path $selDriversFolder  | Out-null
     }
     if(!(Test-Path "$selDriversFolder\IEDriverServer.exe")) {
@@ -360,10 +360,10 @@ catch {
 #Install Selenium Chrome driver
 try {
     chromedriver --help | Out-null
-    echo "The Selenium Chrome driver is installed."
+    echo "The Selenium Chrome driver is installed"
 } 
 catch {
-    echo "Selenium Chrome driver doesn't seem to be installed."
+    echo "Selenium Chrome driver doesn't seem to be installed"
     echo "Downloading Selenium Chrome driver ZIP..."
     $source = $selChromeDriverURL
     $Filename = [System.IO.Path]::GetFileName($source)
@@ -372,7 +372,7 @@ catch {
     $wc.DownloadFile($source, $dest)
 
     if (!(Test-Path $selDriversFolder)) {
-        echo "Creating a folder for the Selenium drivers."
+        echo "Creating a folder for the Selenium drivers"
         New-Item -ItemType directory -Path $selDriversFolder  | Out-null
     }
     if(!(Test-Path "$selDriversFolder\chromedriver.exe")) {
@@ -395,7 +395,7 @@ $demoBrowser = getDemoBrowser
 if($demoBrowser) {
 #Be carefull with the test indentation and spacing.
     echo "*Settings*
-Documentation	     Test suite created with FireRobot.
+Documentation	     Test suite created with FireRobot
 Library	   Selenium2Library   15.0   5.0
 *Test Cases *
 EA Installer Demo Test
