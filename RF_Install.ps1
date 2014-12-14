@@ -16,6 +16,7 @@ In the end of the process, the following resources should be installed:
 
 The only part of the script that's not fully automatic is the wxPython installation. You'll still have to go thru the wizard.
 If you are not interested in using RIDE, just comment that part of the script along with wxPython.
+If outdated versions of the Robot Framework or the Selenium2library are found, the user will be prompted to update them.
 
 IMPORTANT! This script uses the 'setx' command to modify the PATH user variable. 
 This means it won't work in Windows XP or previous, unless it's installed from the Service Pack 2 Support Tools.
@@ -51,12 +52,12 @@ Dependencies: Internet connectivity
 Python Installation
 
 Starts by running the 'python -V' command
-If a compatible version is found (2.7.x) it will read the path environment variable to get it's location and store it.
+If a compatible version is found (2.7.x) it will read the PATH environment variable to get it's location and store it.
 Python 2.5 and 2.6 are supposed to be compatible with RF, but they would not be OK for the PIP and wxPython versions we are using.
 If an incompatible version is found, it will show a warning to remove it from the PATH environment variable 
 or rename python.exe to something else (e.g. python3.exe) and rerun this script.
 If the 'python -V' command fails, it will search for python.exe in it's standard location (c:\python27\).
-If it's present, it will assume that there's already a valid installation and just add it's location to 'path'.
+If it's present, it will assume that there's already a valid installation and just add it's location to 'PATH'.
 If it can't find it, it will download a compatible python .msi installer and run it. Afterwards it will add it's location to 'path'.
 
 
@@ -64,8 +65,8 @@ PIP Installation
 
 Starts by running the 'pip -V' command
 If the 'pip -V' command fails, it will search for pip.exe in it's standard locations (e.g. c:\python27\Scripts\).
-If it's present, it will assume that there's already a valid installation and just add it's location to 'path'.
-If it can't find it, it will download the installer and run it, afterwards it will add it's location to 'path'.
+If it's present, it will assume that there's already a valid installation and just add it's location to 'PATH'.
+If it can't find it, it will download the installer and run it, afterwards it will add it's location to 'PATH'.
 
 
 Robot Framework Installation
@@ -125,25 +126,44 @@ if (${env:programfiles(x86)}) {
 }
 
 #The IE and Chrome selenium drivers will be placed here if not already installed. 
-#Folder is created if not existing and added to path.
+#Folder is created if not existing and added to PATH.
 #Change folder location if necessary.
 $selDriversFolder = "c:\Selenium Drivers"
 
-#We will modify the user 'path' environment variable, if necessary.
+#We will modify the user 'PATH' environment variable, if necessary.
 $userPath = [System.Environment]::GetEnvironmentVariable("path","User")
 
 #To unzip the selenium drivers for IE and Chrome
 function Expand-ZIPFile($file, $destination)
-    {
-        $shell = new-object -com shell.application
-        $zip = $shell.NameSpace($file)
-        foreach($item in $zip.items())
-        {
-            $shell.Namespace($destination).copyhere($item)
-        }
+{
+    $shell = new-object -com shell.application
+    $zip = $shell.NameSpace($file)
+    foreach($item in $zip.items()) {
+        $shell.Namespace($destination).copyhere($item)
+    }
 }
 # Add the alias
 new-alias unzip expand-zipfile
+
+
+#Check if a PIP managed package is up to date
+#If not, ask if we want to update
+function checkUpdates($package)
+{   
+    $outdatedList = pip list -o
+    $outdated = $outdatedList | select-string  -pattern "^$package "
+    if ($outdated) {
+        $outdated
+        $confirm = Read-Host "Upgrade now? [Y]es:"
+        if($confirm -eq 'Y' -Or $confirm -eq 'y') {
+            pip install --upgrade $package  |  Out-Null
+            echo "Finished upgrading the $package package"
+        }
+    } else {
+        echo "Package $package is up to date"
+    }
+}
+
 
 #TODO is this reliable? Is there a better option?
 #Checks if Firefox or Chrome are installed to do a demo test run
@@ -179,14 +199,14 @@ try {
     echo "The 'setx' command doesn't seem to be available"
     if(Test-Path c:\Windows\System32\setx.exe) {
         echo "setx.exe is available at c:\Windows\System32"
-        echo "We'll add c:\Windows\System32 to the Path environment variable"
+        echo "We'll add c:\Windows\System32 to the PATH environment variable"
         c:\Windows\System32\setx.exe   path "$userPath;c:\Windows\System32"  | Out-Null
         $userPath = [System.Environment]::GetEnvironmentVariable("path","User")
         $env:path = [System.Environment]::GetEnvironmentVariable("path","Machine") + ";$userPath"
     } else {
-        echo "WARNING! The setx command doesn't seem to ba available in you system."
+        echo "WARNING! The setx command doesn't seem to be available in you system."
         echo "It's not available by default in Windows XP or previous, unless it's installed from the Service Pack 2 Support Tools."
-        echo "Without it, we cannot update the Path environment variable."
+        echo "Without it, we cannot update the PATH environment variable."
         echo "We will now quit this script"
         Read-Host 'Press Enter to close...' | Out-Null
         exit  
@@ -279,9 +299,11 @@ try {$pipVersion = pip -V
 try {
     $RFVersion = pybot --version
     echo "Robot Framework is installed with version: $RFVersion"
+    echo "Checking if the Robot Framework is up to date..."
+    checkUpdates("robotframework")
 } catch {
     echo "Unable to get the local Robot Framework version"
-    echo "Installing the RobotFramework..."
+    echo "Installing the Robot Framework..."
     pip install robotframework  | Out-null
 }
 
@@ -290,6 +312,8 @@ try {
 $seleniumFolderExists = Test-Path "$pythonPath\Lib\site-packages\Selenium2Library" -PathType Any
 if($seleniumFolderExists) {
     echo  "The Selenium2library seems to be installed."
+    echo "Checking if the The Selenium2library is up to date..."
+    checkUpdates("robotframework-selenium2library")
     }
 else { 
     echo "The Selenium2library doesn't seem to be installed"
@@ -323,7 +347,7 @@ catch {
         echo "Unziping the Selenium IE driver to $selDriversFolder"
         unzip  $dest  $selDriversFolder | Out-null
     }
-    echo "Adding $selDriversFolder to path"
+    echo "Adding $selDriversFolder to PATH"
     setx path "$userPath;$selDriversFolder"   | Out-null
     $userPath = [System.Environment]::GetEnvironmentVariable("path","User")
     $env:path = [System.Environment]::GetEnvironmentVariable("path","Machine") + ";$userPath"
@@ -356,7 +380,7 @@ catch {
         unzip  $dest  $selDriversFolder  | Out-null
     }
     if(! $driverFolderIsInPath) {
-        echo "Adding $selDriversFolder to path"
+        echo "Adding $selDriversFolder to PATH"
         setx path "$userPath;$selDriversFolder"  | Out-null
         $userPath = [System.Environment]::GetEnvironmentVariable("path","User")
         $env:path = [System.Environment]::GetEnvironmentVariable("path","Machine") + ";$userPath"
@@ -403,6 +427,7 @@ else {
 
 
 #Install RIDE and open it
+#RIDE checks for updates on start by default, we don't have to use our checkUpdates function
 try {
    echo "Trying to open RIDE..."
    if($demoBrowser)  {
@@ -414,7 +439,7 @@ try {
 catch {
    echo "RIDE doesn't seem to be installed"
    echo "Installing RIDE..."
-   pip install robotframework-ride   | Out-null
+   pip install robotframework-ride  | Out-null
    echo "Opening RIDE..."
    if($demoBrowser)  {
         Start-Process ride.py  c:\Temp\test.txt

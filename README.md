@@ -14,6 +14,7 @@ In the end of the process, the following resources should be installed:
 
 The only part of the script that's not fully automatic is the wxPython installation. You'll still have to go thru the wizard.
 If you are not interested in using RIDE, just comment that part of the script along with wxPython.
+If outdated versions of the Robot Framework or the Selenium2library are found, the user will be prompted to update them.
 
 IMPORTANT! This script uses the 'setx' command to modify the PATH user variable. 
 This means it won't work in Windows XP or previous, unless it's installed from the Service Pack 2 Support Tools.
