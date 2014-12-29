@@ -34,7 +34,7 @@ License: Apache 2.0
 - Download or copy/paste the script into a file. Don't forget the .ps1 extension.
 - Right click the file and choose 'Run with PowerShell'.
 - If script execution is disabled in you system, follow the instructions at http://www.tech-recipes.com/rx/6679/windows-7-enable-execution-of-windows-powershell-scripts/
-- If you want more feedback from the script remove/comment the redirects to Out-Null
+- If you want more feedback from the script remove/comment the redirects to Out-Null.
 - In Windows, the only part of the script that's not fully automatic is the wxPython installation. You'll still have to go thru the wizard.
 
 IMPORTANT! This script uses the 'setx' command to modify the PATH user variable. 
@@ -46,6 +46,6 @@ This script doesn't deal with those. For more info check https://code.google.com
 
 <strong>Ubuntu:</strong>
 
-- Don't forget to make the script file executable, e.g. 'chmod a+x RF_Install.sh'
-- Don't forget to run the script with root privileges, e.g. 'sudo ./RF_Install.sh'
-- If you want more feedback from the script remove/comment the redirects to /dev/null
+- Don't forget to make the script file executable, e.g. 'chmod a+x RF_Install.sh'.
+- Don't forget to run the script with root privileges, e.g. 'sudo ./RF_Install.sh'.
+- If you want more feedback from the script remove/comment the redirects to /dev/null.
