@@ -29,7 +29,7 @@ License: Apache 2.0
 <br>
 <strong>USAGE</strong>
 
-<strong>.Windows:</strong>
+<strong>Windows:</strong>
 
 - Download or copy/paste the script into a file. Don't forget the .ps1 extension.
 - Right click the file and choose 'Run with PowerShell'.
@@ -44,7 +44,7 @@ IMPORTANT! If you really want to do selenium tests on IE, beware that there are 
 This script doesn't deal with those. For more info check https://code.google.com/p/selenium/wiki/InternetExplorerDriver#Required_Configuration
 
 
-<strong>.Ubuntu:</strong>
+<strong>Ubuntu:</strong>
 
 - Don't forget to make the script file executable, e.g. 'chmod a+x RF_Install.sh'
 - Don't forget to run the script with root privileges, e.g. 'sudo ./RF_Install.sh'
