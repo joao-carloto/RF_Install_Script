@@ -32,7 +32,7 @@ Script: RF_Installer.ps1
 Author: João Carloto, Twitter: @JMCarloto
 Github repo: https://github.com/joao-carloto/RF_Install_Script
 License: Apache 2.0
-Version: 0.1
+Version: 0.2
 Dependencies: Internet connectivity
               The 'setx' command
 
@@ -151,7 +151,7 @@ new-alias unzip expand-zipfile
 function checkUpdates($package)
 {   
     $outdatedList = pip list -o
-    $outdated = $outdatedList | select-string  -pattern "^$package "
+    $outdated = $outdatedList | select-string  -pattern "^$package.*Current:.*Latest:.*"
     if ($outdated) {
         $outdated
         $confirm = Read-Host "Upgrade now? [Y]es:"
@@ -268,7 +268,7 @@ try {
 
 #Install PIP
 try {$pipVersion = pip -V
-    echo "PIP is installed with version: $pipVersion" 
+    echo "PIP is installed with version: $pipVersion"
 } catch {
     echo "Unable to get the local PIP version"
     $pipExists = Test-Path "$pythonPath\Scripts\pip.exe" -PathType Any
