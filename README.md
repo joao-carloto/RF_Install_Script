@@ -20,6 +20,9 @@ Two versions of the script are provided:
 IMPORTANT! The installer download locations were valid at the time of this scrip conception, but these may change. 
 If you find some invalid URL please report an issue at https://github.com/joao-carloto/RF_Install_Script/issues
 
+IMPORTANT! The script includes a demo test to be run after the installation.
+Do not change the test indentation, unless you know what you are doing. You may end up with an invalid test script.
+
 
 Author: João Carloto, Twitter: @JMCarloto<br>
 Github repo: https://github.com/joao-carloto/RF_Install_Script<br>
@@ -31,7 +34,7 @@ License: Apache 2.0
 
 <strong>Windows:</strong>
 
-- Download or copy/paste the script into a file. Don't forget the .ps1 extension.
+- Download and unzip the project (which includes the RF_Install.ps1 file).
 - Right click the file and choose 'Run with PowerShell'.
 - If script execution is disabled in you system, follow the instructions at http://www.tech-recipes.com/rx/6679/windows-7-enable-execution-of-windows-powershell-scripts/
 - If you want more feedback from the script remove/comment the redirects to Out-Null.
@@ -46,6 +49,7 @@ This script doesn't deal with those. For more info check https://code.google.com
 
 <strong>Ubuntu:</strong>
 
+- Download and unzip the project (which includes the RF_Install.sh file).
 - Don't forget to make the script file executable, e.g. 'chmod a+x RF_Install.sh'.
 - Don't forget to run the script with root privileges, e.g. 'sudo ./RF_Install.sh'.
 - If you want more feedback from the script remove/comment the redirects to /dev/null.
