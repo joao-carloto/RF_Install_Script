@@ -12,7 +12,7 @@
   </head>
 
   <body>
-
+  
     <!-- HEADER -->
     <div id="header_wrap" class="outer">
         <header class="inner">
@@ -31,12 +31,11 @@
     <!-- MAIN CONTENT -->
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
-        <h3>
-<a id="synopsis" class="anchor" href="#synopsis" aria-hidden="true"><span class="octicon octicon-link"></span></a>SYNOPSIS</h3>
+        
+<h3><a id="synopsis" class="anchor" href="#synopsis" aria-hidden="true"><span class="octicon octicon-link"></span></a>SYNOPSIS</h3>
 
-<p>This Windows PowerShell script will download and install the Robot Framework, all it's required dependencies 
-(if not already available) and some extra libraries and tools.
-If necessary, it will also modify the user 'Path' environment variable, so to include the necessary folders.</p>
+<p>This script will download and install the Robot Framework, all it's required dependencies (if not already available) and some extra libraries and tools.
+If necessary, it will also modify the user 'path' environment variable, so to include the necessary folders.</p>
 
 <p>In the end of the process, the following resources should be installed:</p>
 
@@ -51,30 +50,46 @@ If necessary, it will also modify the user 'Path' environment variable, so to in
 <li>RIDE</li>
 </ul>
 
-<p>The only part of the script that's not fully automatic is the wxPython installation. You'll still have to go thru the wizard.<br>
-If you are not interested in using RIDE, just comment that part of the script along with wxPython.<br>
-If outdated versions of the Robot Framework or the Selenium2library are found, the user will be prompted to update them.  
-</p>
-
-<p>IMPORTANT! This script uses the 'setx' command to modify the PATH user variable. This means it won't work in Windows XP or previous, unless it's installed from the Service Pack 2 Support Tools.</p>
+<p>Two versions of the script are provided:</p>
+<ul>
+<li>A PowerShell script for Windows (RF_Install.ps1).</li>
+<li>A Bash script for Ubuntu  (RF_Install.sh).</li>
+</ul>
 
 <p>IMPORTANT! The installer download locations were valid at the time of this scrip conception, but these may change. If you find some invalid URL please report an issue at <a href="https://github.com/joao-carloto/RF_Install_Script/issues">https://github.com/joao-carloto/RF_Install_Script/issues</a></p>
-
-<p>IMPORTANT! If you really want to do selenium tests on IE, beware that there are some necessary browser configurations to be made. This script doesn't deal with those. For more info check <a href="https://code.google.com/p/selenium/wiki/InternetExplorerDriver#Required_Configuration">https://code.google.com/p/selenium/wiki/InternetExplorerDriver#Required_Configuration</a></p>
+<p>IMPORTANT! The script includes a demo test to be run after the installation.
+Do not change the test indentation, unless you know what you are doing. You may end up with an invalid test script.</p>
 
 <h3>
 <a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>USAGE</h3>
 
+<p><strong>Windows:</strong></p>
 <ul>
-<li>Download or copy/paste the script into a file. Don't forget the .ps1 extension.</li>
+<li>Download and unzip the project (which includes the RF_Install.ps1 file).</li>
 <li>Right click the file and choose 'Run with PowerShell'.</li>
-<li>If script execution is disabled in you system, follow the instructions at <a href="http://www.tech-recipes.com/rx/6679/windows-7-enable-execution-of-windows-powershell-scripts/">http://www.tech-recipes.com/rx/6679/windows-7-enable-execution-of-windows-powershell-scripts/</a>
-</li>
+<li>If script execution is disabled in you system, follow the instructions at <a href="http://www.tech-recipes.com/rx/6679/windows-7-enable-execution-of-windows-powershell-scripts/">http://www.tech-recipes.com/rx/6679/windows-7-enable-execution-of-windows-powershell-scripts/</a></li>
+<li>If you want more feedback from the script remove/comment the redirects to Out-Null.</li>
+<li>In Windows, the only part of the script that's not fully automatic is the wxPython installation. You'll still have to go thru the wizard.</li>
 </ul>
 
+<p>IMPORTANT! This script uses the 'setx' command to modify the PATH user variable. This means it won't work in Windows XP or previous, unless it's installed from the Service Pack 2 Support Tools.</p>
+<p>IMPORTANT! If you really want to do selenium tests on IE, beware that there are some necessary browser configurations to be made. This script doesn't deal with those. For more info check <a href="https://code.google.com/p/selenium/wiki/InternetExplorerDriver#Required_Configuration">https://code.google.com/p/selenium/wiki/InternetExplorerDriver#Required_Configuration</a></p>
+
 <image src="http://i.imgur.com/w9Fs0cl.png?1"  width="630px" height="auto"></image>
-      </section>
-    </div>
+
+<p><strong>Ubuntu:</strong></p>
+<ul>
+<li>Download and unzip the project (which includes the RF_Install.sh file).</li>
+<li>Don't forget to make the script file executable, e.g. 'chmod a+x RF_Install.sh'.</li>
+<li></li>Don't forget to run the script with root privileges, e.g. 'sudo ./RF_Install.sh'.</li>
+<li></li>If you want more feedback from the script remove/comment the redirects to /dev/null.</li>
+</ul>
+
+<image src="http://i.imgur.com/wcqwvuH.png?1"  width="630px" height="auto"></image>
+
+</section>
+    
+</div>
 
     <!-- FOOTER  -->
     <div id="footer_wrap" class="outer">
