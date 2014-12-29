@@ -1,4 +1,4 @@
-.SYNOPSIS
+<strong>SYNOPSIS</strong>
 
 
 This script will download and install the Robot Framework, all it's required dependencies (if not already available) and some extra libraries and tools.
@@ -20,14 +20,14 @@ Two versions of the script are provided:
 IMPORTANT! The installer download locations were valid at the time of this scrip conception, but these may change. 
 If you find some invalid URL please report an issue at https://github.com/joao-carloto/RF_Install_Script/issues
 
-<br>
+
 Author: João Carloto, Twitter: @JMCarloto<br>
 Github repo: https://github.com/joao-carloto/RF_Install_Script<br>
 License: Apache 2.0
 
 
 <br>
-.USAGE
+<strong>USAGE</strong>
 
 <strong>.Windows:</strong>
 
