@@ -32,7 +32,7 @@ Script: RF_Installer.ps1
 Author: João Carloto, Twitter: @JMCarloto
 Github repo: https://github.com/joao-carloto/RF_Install_Script
 License: Apache 2.0
-Version: 0.2
+Version: 0.3
 Dependencies: Internet connectivity
               The 'setx' command
 
@@ -114,15 +114,19 @@ Runs the test script using pybot.
 #Installer locations. Modify these if outdated.
 $pythonURL = "https://www.python.org/ftp/python/2.7.8/python-2.7.8.msi"
 $pipURL = "https://bootstrap.pypa.io/get-pip.py"
-$wxPythonURL = "https://log-parser.googlecode.com/files/wxPython2.8-win32-unicode-2.8.12.1-py27.exe"
+$wxPython32URL = "ftp://ftp.mirrorservice.org/sites/downloads.sourceforge.net/w/wx/wxpython/wxPython/2.8.12.1/wxPython2.8-win32-unicode-2.8.12.1-py27.exe"
+$wxPython64URL = "ftp://ftp.mirrorservice.org/sites/downloads.sourceforge.net/w/wx/wxpython/wxPython/2.8.12.1/wxPython2.8-win64-unicode-2.8.12.1-py27.exe"
 $selChromeDriverURL = "http://chromedriver.storage.googleapis.com/2.9/chromedriver_win32.zip"
+$selIEDriver32URL = "http://selenium-release.storage.googleapis.com/2.44/IEDriverServer_Win32_2.44.0.zip"
+$selIEDriver64URL = "http://selenium-release.storage.googleapis.com/2.44/IEDriverServer_x64_2.44.0.zip"
 
-#64Bits
+
+#IE 64Bits
 if (${env:programfiles(x86)}) { 
-    $selIEDriverURL = "http://selenium-release.storage.googleapis.com/2.44/IEDriverServer_x64_2.44.0.zip"
-#32 bits
+    $selIEDriverURL = $selIEDriver64URL
+#IE 32 bits
 } else {
-    $selIEDriverURL = "http://selenium-release.storage.googleapis.com/2.44/IEDriverServer_Win32_2.44.0.zip"
+    $selIEDriverURL = $selIEDriver32URL
 }
 
 #The IE and Chrome selenium drivers will be placed here if not already installed. 
@@ -259,7 +263,7 @@ try {
         $pythonPath = "c:\python27"
         echo "Adding the Python folder to the PATH environment variable..."
     }
-    #This is th user path not the system
+    #This is the user path not the system
     setx path "$userPath;$pythonPath"   | Out-null
     $userPath = [System.Environment]::GetEnvironmentVariable("path","User")
     $env:path = [System.Environment]::GetEnvironmentVariable("path","Machine") + ";$userPath"
@@ -413,13 +417,29 @@ if($wxPythonFolderExists) {
 }
 else {
     echo "wxPython doesn't seem to be installed"
-    echo "Installing wxPython..."
-    $source = $wxPythonURL
 
+    $pythonBitMode = python -c "import platform; print platform.architecture()"
+    $pythonBitMode = [String]$pythonBitMode
+
+    if ([Regex]::IsMatch($pythonBitMode,"32bit")) {
+        $wxPythonURL = $wxPython32URL
+    } 
+    elseif ([Regex]::IsMatch($pythonBitMode,"64bit"))  {
+        $wxPythonURL = $wxPython64URL
+    } else {
+        echo "Warning! Unable to check the Ptyhon bit mode (necessary to choose the wxPython version to install)"
+        echo "This script will exit"
+        pause
+        Exit 
+    }
+    echo "Downloading wxPython..."
+    $source = $wxPythonURL
     $Filename = [System.IO.Path]::GetFileName($source)
     $dest = "C:\Temp\$Filename"
     $wc = New-Object System.Net.WebClient
     $wc.DownloadFile($source, $dest)
+
+    echo "Installing wxPython..."
     #Silent install mode does not work with this one
     Start-Process $dest /qn -Wait
     Remove-Item   $dest
