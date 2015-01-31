@@ -13,14 +13,16 @@ In the end of the process, the following resources should be installed:
 - wxPython (version 2.8.12.1, necessary to run RIDE)
 - RIDE
 
+If you don't need all of these, just comment the respective parts.
+
 Two versions of the script are provided:
 - A PowerShell script for Windows (RF_Install.ps1).
 - A Bash script for Ubuntu  (RF_Install.sh).
 
-IMPORTANT! The installer download locations were valid at the time of this scrip conception, but these may change. 
+IMPORTANT - The installer download locations were valid at the time of this scrip conception, but these may change. 
 If you find some invalid URL please report an issue at https://github.com/joao-carloto/RF_Install_Script/issues
 
-IMPORTANT! The script includes a demo test to be run after the installation.
+IMPORTANT - The script includes a demo test to be run after the installation.
 Do not change the test indentation, unless you know what you are doing. You may end up with an invalid test script.
 
 
@@ -40,10 +42,10 @@ License: Apache 2.0
 - If you want more feedback from the script remove/comment the redirects to Out-Null.
 - In Windows, the only part of the script that's not fully automatic is the wxPython installation. You'll still have to go thru the wizard.
 
-IMPORTANT! This script uses the 'setx' command to modify the PATH user variable. 
+IMPORTANT - This script uses the 'setx' command to modify the PATH user variable. 
 This means it won't work in Windows XP or previous, unless it's installed from the Service Pack 2 Support Tools.
 
-IMPORTANT! If you really want to do selenium tests on IE, beware that there are some necessary browser configurations to be made.
+IMPORTANT - If you really want to do selenium tests on IE, beware that there are some necessary browser configurations to be made.
 This script doesn't deal with those. For more info check https://code.google.com/p/selenium/wiki/InternetExplorerDriver#Required_Configuration
 
 
