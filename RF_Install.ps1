@@ -32,7 +32,7 @@ Script: RF_Installer.ps1
 Author: João Carloto, Twitter: @JMCarloto
 Github repo: https://github.com/joao-carloto/RF_Install_Script
 License: Apache 2.0
-Version: 0.3
+Version: 0.4
 Dependencies: Internet connectivity
               The 'setx' command
 
@@ -111,8 +111,8 @@ Runs the test script using pybot.
 #>
 
 
-#Installer locations. Modify these if outdated.
-$pythonURL = "https://www.python.org/ftp/python/2.7.8/python-2.7.8.msi"
+#Installerlocations. Modify these if outdated.
+$pythonURL = "https://www.python.org/ftp/python/2.7.9/python-2.7.9.msi"
 $pipURL = "https://bootstrap.pypa.io/get-pip.py"
 $wxPython32URL = "ftp://ftp.mirrorservice.org/sites/downloads.sourceforge.net/w/wx/wxpython/wxPython/2.8.12.1/wxPython2.8-win32-unicode-2.8.12.1-py27.exe"
 $wxPython64URL = "ftp://ftp.mirrorservice.org/sites/downloads.sourceforge.net/w/wx/wxpython/wxPython/2.8.12.1/wxPython2.8-win64-unicode-2.8.12.1-py27.exe"
@@ -251,7 +251,7 @@ try {
         echo  "We'll just add it to the PATH environment variable..."
     } else {
         echo "Could not find a compatible Python installation on the root of the c:\ drive"
-        echo "Downloading the Python 2.7.8 installer..."
+        echo "Downloading the Python 2.7.9 installer..."
         $source = $pythonURL
         $Filename = [System.IO.Path]::GetFileName($source)
         $dest = "C:\Temp\$Filename"
