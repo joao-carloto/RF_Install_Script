@@ -44,7 +44,7 @@ bitMode=$(uname -m)
 if [ "$bitMode" == "i686" ]; then
 	selChromeDriver="chromedriver_linux32.zip"
 elif [ "$bitMode" == "x86_64" ]; then
-	selChromeDriver="chromedriver_linu64.zip"
+	selChromeDriver="chromedriver_linux64.zip"
 else
 	echo "Warning! Unable to get the Kernel bit mode"
 	echo "Exiting the script"
