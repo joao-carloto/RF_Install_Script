@@ -116,8 +116,9 @@ Runs the test script using pybot.
 $python32URL = "https://www.python.org/ftp/python/2.7.11/python-2.7.11.msi"
 $python64URL = "https://www.python.org/ftp/python/2.7.11/python-2.7.11.amd64.msi"
 $pipURL = "https://bootstrap.pypa.io/get-pip.py"
-$wxPython32URL = "http://downloads.sourceforge.net/wxpython/wxPython3.0-win32-3.0.2.0-py27.exe"
-$wxPython64URL = "http://downloads.sourceforge.net/wxpython/wxPython3.0-win64-3.0.2.0-py27.exe"
+#$wxPython32URL = "http://downloads.sourceforge.net/wxpython/wxPython3.0-win32-3.0.2.0-py27.exe"
+$wxPython32URL = "http://downloads.sourceforge.net/wxpython/wxPython/3.0.2.0/wxPython3.0-win32-3.0.2.0-py27.exe"
+$wxPython64URL = "http://downloads.sourceforge.net/wxpython/wxPython/3.0.2.0/wxPython3.0-win64-3.0.2.0-py27.exe"
 $selChromeDriverURL = "http://chromedriver.storage.googleapis.com/2.22/chromedriver_win32.zip"
 $selIEDriver32URL = "http://selenium-release.storage.googleapis.com/2.53/IEDriverServer_Win32_2.53.1.zip"
 $selIEDriver64URL = "http://selenium-release.storage.googleapis.com/2.53/IEDriverServer_x64_2.53.1.zip"
@@ -132,8 +133,11 @@ if (${env:programfiles(x86)}) {
     $selIEDriverURL = $selIEDriver32URL # Disabled $selIEDriver64URL because of sendkeys high delay bug
 	$selOperaDriverURL = $selOperaDriver64URL
 	$wxPythonURL = $wxPython64URL
-	$pythonURL = $python64URL
-	$py32comURL = $py32com64URL
+    # If python 32bit is installed we must use 32bit versions
+	# $pythonURL = $python64URL
+	# $py32comURL = $py32com64URL
+	$pythonURL = $python32URL
+	$py32comURL = $py32com32URL
 #all 32 bits packages
 } else {
         $selIEDriverURL = $selIEDriver32URL
@@ -186,7 +190,7 @@ function checkUpdates($package)
 #TODO is this reliable? Is there a better option?
 #Checks if Firefox or Chrome are installed to do a demo test run
 #Won't return IE due to the need of additional configurations
-$firefoxPath = $env:LOCALAPPDATA + "\Mozilla\Firefox"
+$firefoxPath = $env:LOCALAPPDATA + "\Mozilla Firefox"
 $chromePath = $env:LOCALAPPDATA + "\Google\Chrome"
 $operaPath = $env:LOCALAPPDATA + "\Opera Software\Opera Stable"
 function getDemoBrowser {
@@ -496,7 +500,7 @@ EA Installer Demo Test
     Open Browser  	http://joao-carloto.github.io/RF_Install_Script/test.html   	$demoBrowser
     Page Should Contain   	RF Install Script Test Page
     Input Text   	sometextbox   	Congratulations!
-    Input Text   	sometextarea    If you are reading this, you have completed your Robot Framework setup.\n\nTo run this test again on RIDE, click on the 'Run Tests' button.\n\nTo learn more about the immense possibilities of the Robot Framework go to http://robotframework.org/." | Out-File -encoding utf8 c:\Temp\test.txt | Out-null
+    Input Text   	sometextarea    If you are reading this, you have completed your Robot Framework setup.\n\nTo run this test again on RIDE, click on the 'Run Tests' button.\n\nTo learn more about the immense possibilities of the Robot Framework go to http://robotframework.org/." | Out-File -encoding utf8 c:\Temp\test.robot | Out-null
 }
 
 
@@ -505,6 +509,7 @@ EA Installer Demo Test
 # if($wxPythonFolderExists) {
 $wxPythonVersion = python -c "import wx; print(wx.VERSION)"
 echo $wxPythonVersion
+$wxPythonVersion = [String]$wxPythonVersion
 #if([Regex]::IsMatch($wxPythonVersion,"(2, 8, 12, 1, '')")){
 if([Regex]::IsMatch($wxPythonVersion,"(3, 0, 2, 0, '')")) {
     echo  "wxPython seems to be installed"
@@ -514,7 +519,6 @@ else {
 
     $pythonBitMode = python -c "import platform; print platform.architecture()"
     $pythonBitMode = [String]$pythonBitMode
-
     if ([Regex]::IsMatch($pythonBitMode,"32bit")) {
         $wxpythonURL = $wxPython32URL
     } 
@@ -528,24 +532,31 @@ else {
     }
     echo "Downloading wxPython..."
     $source = $wxpythonURL
-    $Filename = [System.IO.Path]::GetFileName($source)
+    # The filename might contain URL parameters, so we use a static name.
+    # $Filename = [System.IO.Path]::GetFileName($source)
+    $Filename = "wxPython_installer.exe"
     $dest = "C:\Temp\$Filename"
     $wc = New-Object System.Net.WebClient
+    echo "command to download wx"
+    echo $source, $dest
     $wc.DownloadFile($source, $dest)
 
     echo "Installing wxPython..."
+    echo "Please use the default actions of the Installer..."
     #Silent install mode does not work with this one
     Start-Process $dest /qn -Wait
     Remove-Item   $dest
 }
 
 #Install Pywin32
+try{
 $pywinVersion = python -c "import pywin; print('PyWin32')"
 echo $pywinVersion
 if([Regex]::IsMatch($pywinVersion,"PyWin32")) {
     echo  "pywin32 seems to be installed"
 }
-else {
+}
+catch {
     echo "pywin32 doesn't seem to be installed"
     echo "You must install dependency for RIDE Desktop Shortcut creation."
     echo "Download http://downloads.sourceforge.net/project/pywin32/pywin32/Build%20220/"
