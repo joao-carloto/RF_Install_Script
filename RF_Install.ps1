@@ -111,12 +111,23 @@ IE won't be used because of needed additional configurations.
 Runs the test script using pybot.
 #>
 
+# Options
+$force32bitApps = $false # Valid for x64bit systems, edit to $true
+$useOldRIDEwxPython = $false # Install official RIDE version 1.5.2.1 with wxPython 2.8.12.1
+                            # Otherwise install not official RIDE version 2.0a2 with wxPython 3.0.2
+$installRIDE = $true        # Install RIDE
+# Not implemented ## $installFirefoxESR = $true # Install Firefox ESR if Firefox is not detected
+$installChromeDriver = $true # Install ChromeDriver even if GoogleChrome is not detected
+# Not implemented ## $installChromeBrowser = $true # Install GoogleChrome if not detected
+$installOperaDriver = $false # Install OperaDriver even if Opera is not detected
+# Not implemented ## $installOperaBrowser = $false # Install Opera if not detected
+$installPhantomJSBrowser = $true # Install PhantomJs if not detected
+$installIEDriver = $true # Install Internet Explorer Driver 32bit version (due to known bug in 64bit version)
 
-#Installerlocations. Modify these if outdated.
+# Installer locations. Modify these if outdated.
 $python32URL = "https://www.python.org/ftp/python/2.7.11/python-2.7.11.msi"
 $python64URL = "https://www.python.org/ftp/python/2.7.11/python-2.7.11.amd64.msi"
 $pipURL = "https://bootstrap.pypa.io/get-pip.py"
-#$wxPython32URL = "http://downloads.sourceforge.net/wxpython/wxPython3.0-win32-3.0.2.0-py27.exe"
 $wxPython32URL = "http://downloads.sourceforge.net/wxpython/wxPython/3.0.2.0/wxPython3.0-win32-3.0.2.0-py27.exe"
 $wxPython64URL = "http://downloads.sourceforge.net/wxpython/wxPython/3.0.2.0/wxPython3.0-win64-3.0.2.0-py27.exe"
 $selChromeDriverURL = "http://chromedriver.storage.googleapis.com/2.22/chromedriver_win32.zip"
@@ -128,24 +139,6 @@ $selPhantomJSURL = "https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.
 $py32com64URL = "http://downloads.sourceforge.net/project/pywin32/pywin32/Build%20220/pywin32-220.win-amd64-py2.7.exe?r=&ts=1466765650&use_mirror=jaist"
 $py32com32URL = "http://downloads.sourceforge.net/project/pywin32/pywin32/Build%20220/pywin32-220.win32-py2.7.exe?r=&ts=1466766580&use_mirror=heanet"
 
-#all 64Bits packages
-if (${env:programfiles(x86)}) { 
-    $selIEDriverURL = $selIEDriver32URL # Disabled $selIEDriver64URL because of sendkeys high delay bug
-	$selOperaDriverURL = $selOperaDriver64URL
-	$wxPythonURL = $wxPython64URL
-    # If python 32bit is installed we must use 32bit versions
-	# $pythonURL = $python64URL
-	# $py32comURL = $py32com64URL
-	$pythonURL = $python32URL
-	$py32comURL = $py32com32URL
-#all 32 bits packages
-} else {
-        $selIEDriverURL = $selIEDriver32URL
-	$selOperaDriverURL = $selOperaDriver32URL
-	$wxPythonURL = $wxPython32URL
-	$pythonURL = $python32URL
-	$py32comURL = $py32com32URL
-}
 
 #The IE and Chrome selenium drivers will be placed here if not already installed. 
 #Folder is created if not existing and added to PATH.
@@ -241,6 +234,29 @@ try {
     }
 }
 
+#all 64Bits packages
+if ( ${env:programfiles(x86)} -And -Not $force32bitApps ) { 
+    $selIEDriverURL = $selIEDriver32URL # Disabled $selIEDriver64URL because of sendkeys high delay bug
+	$selOperaDriverURL = $selOperaDriver64URL
+	if($useOldRIDEwxPython){
+        $wxPythonURL = "https://sourceforge.net/projects/wxpython/files/wxPython/2.8.12.1/wxPython2.8-win64-unicode-2.8.12.1-py27.exe/download"
+    } else {
+        $wxPythonURL = $wxPython64URL
+    }
+	$pythonURL = $python64URL
+	$py32comURL = $py32com64URL
+#all 32 bits packages
+} else {
+        $selIEDriverURL = $selIEDriver32URL
+	$selOperaDriverURL = $selOperaDriver32URL
+	if($useOldRIDEwxPython){
+        $wxPythonURL = "https://sourceforge.net/projects/wxpython/files/wxPython/2.8.12.1/wxPython2.8-win32-unicode-2.8.12.1-py27.exe/download"
+    } else {
+        $wxPythonURL = $wxPython32URL
+    }
+	$pythonURL = $python32URL
+	$py32comURL = $py32com32URL
+}
 
 #Install Python
 try {
@@ -293,6 +309,30 @@ try {
     $env:path = [System.Environment]::GetEnvironmentVariable("path","Machine") + ";$userPath"
 }
 
+try{
+      $pythonArch = python -c "import platform; print(platform.architecture()[0])"
+      if($pythonArch -like "32*"){
+      $force32bitApps = $true # If python 32bit is installed we must use 32bit versions
+      }
+} catch{
+        echo "Warning! Unable to check the Python bit mode"
+        echo "output was: $pythonArch"
+        echo "This script will exit"
+        pause
+        Exit 
+}
+
+if($force32bitApps){
+        $selIEDriverURL = $selIEDriver32URL
+	$selOperaDriverURL = $selOperaDriver32URL
+	if($useOldRIDEwxPython){
+        $wxPythonURL = "https://sourceforge.net/projects/wxpython/files/wxPython/2.8.12.1/wxPython2.8-win32-unicode-2.8.12.1-py27.exe/download"
+    } else {
+        $wxPythonURL = $wxPython32URL
+    }
+	$py32comURL = $py32com32URL
+}
+
 
 #Install PIP
 try {$pipVersion = pip -V
@@ -325,7 +365,7 @@ try {$pipVersion = pip -V
 #Upgrade pip
 try {
     $pipup = pip install -U pip
-    echo "Upgraded pip."
+    echo "Upgraded pip if needed."
 } catch {
     echo "Unable to upgrade pip."
     pip --version
@@ -359,6 +399,7 @@ else {
 }
 
 
+if($installIEDriver) {
 #Install Selenium IE driver
 try {
    #Old versions don't support the --help flag
@@ -392,8 +433,9 @@ catch {
 
     Remove-Item   $dest
 }
+}
 
-
+if($installChromeDriver){
 #Install Selenium Chrome driver
 try {
     chromedriver --help | Out-null
@@ -424,7 +466,9 @@ catch {
     }
     Remove-Item   $dest  | Out-null
 }
+}
 
+if($installOperaDriver){
 #Install Opera driver
 try {
     operadriver --version | Out-null
@@ -455,7 +499,9 @@ catch {
     }
     Remove-Item   $dest  | Out-null
 }
+}
 
+if($installPhantomJSBrowser){
 #Install PhantomJs driver/browser
 try {
     phantomjs --version | Out-null
@@ -487,9 +533,11 @@ catch {
     }
     Remove-Item   $dest  | Out-null
 }
+}
 #Writes a demo test script, if Firefox, Chrome or Opera are installed
 $demoBrowser = getDemoBrowser
 
+echo "Browser is $demoBrowser "
 if($demoBrowser) {
 #Be carefull with the test indentation and spacing.
     echo "*Settings*
@@ -504,32 +552,31 @@ EA Installer Demo Test
 }
 
 
+if($installRIDE){
 #Install wxPython
-# $wxPythonFolderExists = Test-Path "$pythonPath\Lib\site-packages\wx-2.8-msw-unicode\wxPython" -PathType Any
-# if($wxPythonFolderExists) {
 $wxPythonVersion = python -c "import wx; print(wx.VERSION)"
-echo $wxPythonVersion
 $wxPythonVersion = [String]$wxPythonVersion
-#if([Regex]::IsMatch($wxPythonVersion,"(2, 8, 12, 1, '')")){
-if([Regex]::IsMatch($wxPythonVersion,"(3, 0, 2, 0, '')")) {
+if([Regex]::IsMatch($wxPythonVersion,"(2, 8, 12, 1, '')") -and $useOldRIDEwxPython ){
+echo  "wxPython seems to be installed"
+} elseif([Regex]::IsMatch($wxPythonVersion,"(3, 0, 2, 0, '')") -and -not $useOldRIDEwxPython) {
     echo  "wxPython seems to be installed"
 }
 else {
     echo "wxPython doesn't seem to be installed"
 
-    $pythonBitMode = python -c "import platform; print platform.architecture()"
-    $pythonBitMode = [String]$pythonBitMode
-    if ([Regex]::IsMatch($pythonBitMode,"32bit")) {
-        $wxpythonURL = $wxPython32URL
-    } 
-    elseif ([Regex]::IsMatch($pythonBitMode,"64bit"))  {
-        $wxpythonURL = $wxPython64URL
-    } else {
-        echo "Warning! Unable to check the Python bit mode (necessary to choose the wxPython version to install)"
-        echo "This script will exit"
-        pause
-        Exit 
-    }
+  #  $pythonBitMode = python -c "import platform; print platform.architecture()"
+  #  $pythonBitMode = [String]$pythonBitMode
+  #  if ([Regex]::IsMatch($pythonBitMode,"32bit")) {
+  #      $wxpythonURL = $wxPython32URL
+  #  } 
+  #  elseif ([Regex]::IsMatch($pythonBitMode,"64bit"))  {
+  #      $wxpythonURL = $wxPython64URL
+  #  } else {
+  #      echo "Warning! Unable to check the Python bit mode (necessary to choose the wxPython version to install)"
+  #      echo "This script will exit"
+  #      pause
+  #      Exit 
+  #  }
     echo "Downloading wxPython..."
     $source = $wxpythonURL
     # The filename might contain URL parameters, so we use a static name.
@@ -548,6 +595,7 @@ else {
     Remove-Item   $dest
 }
 
+if(-Not $useOldRIDEwxPython){
 #Install Pywin32
 try{
 $pywinVersion = python -c "import pywin; print('PyWin32')"
@@ -572,6 +620,7 @@ catch {
     Start-Process $dest /qn -Wait
     Remove-Item   $dest
 }
+}
 
 #Install RIDE and open it
 #RIDE checks for updates on start by default, we don't have to use our checkUpdates function
@@ -586,9 +635,13 @@ try {
 catch {
    echo "RIDE doesn't seem to be installed"
    echo "Installing RIDE..."
-   # pip install robotframework-ride  | Out-null
-   echo "Installing RIDE from https://github.com/HelioGuilherme66/RIDE/"
-   pip install -U https://github.com/HelioGuilherme66/RIDE/archive/v2.0a2.zip | Out-null
+   if($useOldRIDEwxPython){
+   echo "Installing RIDE 1.5.2.1 from PyPY"
+   pip install robotframework-ride==1.5.2.1  | Out-null
+   } else {
+      echo "Installing RIDE from https://github.com/HelioGuilherme66/RIDE/"
+      pip install -U https://github.com/HelioGuilherme66/RIDE/archive/v2.0a2.zip | Out-null
+   }
 
    echo "Opening RIDE..."
    if($demoBrowser)  {
@@ -597,7 +650,7 @@ catch {
         Start-Process ride.py --version
    }
 }
-
+}
 
 #Run a sample test with pybot
 if($demoBrowser)  {
