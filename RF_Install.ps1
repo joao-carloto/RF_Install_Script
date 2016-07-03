@@ -184,11 +184,12 @@ function checkUpdates($package)
 #Checks if Firefox or Chrome are installed to do a demo test run
 #Won't return IE due to the need of additional configurations
 $firefoxPath = $env:LOCALAPPDATA + "\Mozilla Firefox"
+$firefoxPath2 = $env:LOCALAPPDATA + "\Mozilla\Firefox"
 $chromePath = $env:LOCALAPPDATA + "\Google\Chrome"
 $operaPath = $env:LOCALAPPDATA + "\Opera Software\Opera Stable"
 function getDemoBrowser {
     # Check if Firefox is installed
-    if(Test-Path $firefoxPath -PathType Container) { 
+    if( (Test-Path $firefoxPath -PathType Container) -or (Test-Path $firefoxPath2 -PathType Container) ){ 
        $browser = "Firefox"
        return  $browser
     }
@@ -434,6 +435,21 @@ catch {
     Remove-Item   $dest
 }
 }
+
+#Install Chrome
+# https://www.google.com/chrome/browser/desktop/index.html?system=true&standalone=1&platform=win64
+# ChromeStandaloneSetup64.exe /silent /install
+
+#Install Firefox
+# https://download.mozilla.org/?product=firefox-45.2.0esr-SSL&os=win64&lang=en-GB
+# "Firefox Setup 45.2.0esr.exe" /S
+
+#Install Opera
+# http://www.opera.com/computer/thanks?ni=stable&os=windows
+# Opera_38.0.2220.31_Setup.exe --silent
+
+#Install Phantomjs (like a webdriver)
+# https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-windows.zip
 
 if($installChromeDriver){
 #Install Selenium Chrome driver
