@@ -136,8 +136,8 @@ $selIEDriver64URL = "http://selenium-release.storage.googleapis.com/2.53/IEDrive
 $selOperaDriver32URL = "https://github.com/operasoftware/operachromiumdriver/releases/download/v0.2.2/operadriver_win32.zip"
 $selOperaDriver64URL = "https://github.com/operasoftware/operachromiumdriver/releases/download/v0.2.2/operadriver_win64.zip"
 $selPhantomJSURL = "https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-windows.zip"
-$py32com64URL = "http://downloads.sourceforge.net/project/pywin32/pywin32/Build%20220/pywin32-220.win-amd64-py2.7.exe?r=&ts=1466765650&use_mirror=jaist"
-$py32com32URL = "http://downloads.sourceforge.net/project/pywin32/pywin32/Build%20220/pywin32-220.win32-py2.7.exe?r=&ts=1466766580&use_mirror=heanet"
+$py32com64URL = "http://downloads.sourceforge.net/project/pywin32/pywin32/Build%20220/pywin32-220.win-amd64-py2.7.exe"
+$py32com32URL = "http://downloads.sourceforge.net/project/pywin32/pywin32/Build%20220/pywin32-220.win32-py2.7.exe"
 
 
 #The IE and Chrome selenium drivers will be placed here if not already installed. 
@@ -598,8 +598,8 @@ else {
 if(-Not $useOldRIDEwxPython){
 #Install Pywin32
 try{
-$pywinVersion = python -c "import pywin; print('PyWin32')"
-echo $pywinVersion
+$pywinVersion = python -c "import pywin; print('PyWin32')"  | Out-null
+# echo $pywinVersion
 if([Regex]::IsMatch($pywinVersion,"PyWin32")) {
     echo  "pywin32 seems to be installed"
 }
