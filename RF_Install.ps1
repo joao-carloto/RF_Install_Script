@@ -11,7 +11,7 @@ In the end of the process, the following resources should be installed:
 - Selenium2library
 - Selenium driver for Internet Explorer
 - Selenium driver for Chrome 
-- wxPython (version 2.8.12.1, necessary to run RIDE)
+- wxPython (version 3.0.2 necessary to run RIDE)
 - RIDE
 
 The only part of the script that's not fully automatic is the wxPython installation. You'll still have to go thru the wizard.
@@ -32,7 +32,7 @@ Script: RF_Installer.ps1
 Author: João Carloto, Twitter: @JMCarloto
 Github repo: https://github.com/joao-carloto/RF_Install_Script
 License: Apache 2.0
-Version: 0.4
+Version: 0.5
 Dependencies: Internet connectivity
               The 'setx' command
 
@@ -78,7 +78,7 @@ If it fails, will install the robot framework using PIP
 Selenium2Library Installation
 
 Starts by checking if the <python folder>\Lib\site-packages.\Selenium2Library folder exists.
-If it fails, will install the selenium2libraryu using PIP.
+If it fails, will install the selenium2library using PIP.
 
 
 Selenium Drivers for Internet Explorer and Chrome
@@ -92,47 +92,58 @@ Adds the folder to PATH
  
 wxPython Installation
 
-Starts by checking if the <python folder>\Lib\site-packages\wx-2.8-msw-unicode\wxPython folder exists.
+#### Starts by checking if the <python folder>\Lib\site-packages\wx-2.8-msw-unicode\wxPython folder exists.
+Starts by running a Python command that shows the installed wxPython version.
 If it fails, downloads the wxPython installer and runs it.
 
 
 RIDE Installation
 
-Starts by running the 'ride.py' command, to open the RIDE GUI.
+Starts by running the 'ride.py --version' command, to check the RIDE version (from 1.5.2.1).
 If it fails, will install RIDE using PIP.
 Tries to open RIDE again.
 
 
 Demo Test
 
-If Firefox or Chrome are installed, writes a demo test scrip on a .txt file.
+If Firefox or Chrome are installed, writes a demo test script on a .robot file.
 IE won't be used because of needed additional configurations.
 Runs the test script using pybot.
 #>
 
+# Options
+$force32bitApps = $false # Valid for x64bit systems, edit to $true
+$useOldRIDEwxPython = $false # Install official RIDE version 1.5.2.1 with wxPython 2.8.12.1
+                            # Otherwise install not official RIDE version 2.0a2 with wxPython 3.0.2
+$installRIDE = $true        # Install RIDE
+# Not implemented ## $installFirefoxESR = $true # Install Firefox ESR if Firefox is not detected
+$installChromeDriver = $true # Install ChromeDriver even if GoogleChrome is not detected
+# Not implemented ## $installChromeBrowser = $true # Install GoogleChrome if not detected
+$installOperaDriver = $false # Install OperaDriver even if Opera is not detected
+# Not implemented ## $installOperaBrowser = $false # Install Opera if not detected
+$installPhantomJSBrowser = $true # Install PhantomJs if not detected
+$installIEDriver = $true # Install Internet Explorer Driver 32bit version (due to known bug in 64bit version)
 
-#Installerlocations. Modify these if outdated.
-$pythonURL = "https://www.python.org/ftp/python/2.7.9/python-2.7.9.msi"
+# Installer locations. Modify these if outdated.
+$python32URL = "https://www.python.org/ftp/python/2.7.11/python-2.7.11.msi"
+$python64URL = "https://www.python.org/ftp/python/2.7.11/python-2.7.11.amd64.msi"
 $pipURL = "https://bootstrap.pypa.io/get-pip.py"
-$wxPython32URL = "ftp://ftp.mirrorservice.org/sites/downloads.sourceforge.net/w/wx/wxpython/wxPython/2.8.12.1/wxPython2.8-win32-unicode-2.8.12.1-py27.exe"
-$wxPython64URL = "ftp://ftp.mirrorservice.org/sites/downloads.sourceforge.net/w/wx/wxpython/wxPython/2.8.12.1/wxPython2.8-win64-unicode-2.8.12.1-py27.exe"
-$selChromeDriverURL = "http://chromedriver.storage.googleapis.com/2.9/chromedriver_win32.zip"
-$selIEDriver32URL = "http://selenium-release.storage.googleapis.com/2.44/IEDriverServer_Win32_2.44.0.zip"
-$selIEDriver64URL = "http://selenium-release.storage.googleapis.com/2.44/IEDriverServer_x64_2.44.0.zip"
+$wxPython32URL = "http://downloads.sourceforge.net/wxpython/wxPython/3.0.2.0/wxPython3.0-win32-3.0.2.0-py27.exe"
+$wxPython64URL = "http://downloads.sourceforge.net/wxpython/wxPython/3.0.2.0/wxPython3.0-win64-3.0.2.0-py27.exe"
+$selChromeDriverURL = "http://chromedriver.storage.googleapis.com/2.22/chromedriver_win32.zip"
+$selIEDriver32URL = "http://selenium-release.storage.googleapis.com/2.53/IEDriverServer_Win32_2.53.1.zip"
+$selIEDriver64URL = "http://selenium-release.storage.googleapis.com/2.53/IEDriverServer_x64_2.53.1.zip"
+$selOperaDriver32URL = "https://github.com/operasoftware/operachromiumdriver/releases/download/v0.2.2/operadriver_win32.zip"
+$selOperaDriver64URL = "https://github.com/operasoftware/operachromiumdriver/releases/download/v0.2.2/operadriver_win64.zip"
+$selPhantomJSURL = "https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-windows.zip"
+$py32com64URL = "http://downloads.sourceforge.net/project/pywin32/pywin32/Build%20220/pywin32-220.win-amd64-py2.7.exe"
+$py32com32URL = "http://downloads.sourceforge.net/project/pywin32/pywin32/Build%20220/pywin32-220.win32-py2.7.exe"
 
-
-#IE 64Bits
-if (${env:programfiles(x86)}) { 
-    $selIEDriverURL = $selIEDriver64URL
-#IE 32 bits
-} else {
-    $selIEDriverURL = $selIEDriver32URL
-}
 
 #The IE and Chrome selenium drivers will be placed here if not already installed. 
 #Folder is created if not existing and added to PATH.
 #Change folder location if necessary.
-$selDriversFolder = "c:\Selenium Drivers"
+$selDriversFolder = "c:\Selenium_Drivers"
 
 #We will modify the user 'PATH' environment variable, if necessary.
 $userPath = [System.Environment]::GetEnvironmentVariable("path","User")
@@ -172,17 +183,24 @@ function checkUpdates($package)
 #TODO is this reliable? Is there a better option?
 #Checks if Firefox or Chrome are installed to do a demo test run
 #Won't return IE due to the need of additional configurations
-$firefoxPath = $env:LOCALAPPDATA + "\Mozilla\Firefox"
+$firefoxPath = $env:LOCALAPPDATA + "\Mozilla Firefox"
+$firefoxPath2 = $env:LOCALAPPDATA + "\Mozilla\Firefox"
 $chromePath = $env:LOCALAPPDATA + "\Google\Chrome"
+$operaPath = $env:LOCALAPPDATA + "\Opera Software\Opera Stable"
 function getDemoBrowser {
     # Check if Firefox is installed
-    if(Test-Path $firefoxPath -PathType Container) { 
+    if( (Test-Path $firefoxPath -PathType Container) -or (Test-Path $firefoxPath2 -PathType Container) ){ 
        $browser = "Firefox"
        return  $browser
     }
     # Check if Chrome is installed
     if(Test-Path $chromePath -PathType Container) {
        $browser = "Chrome"
+       return  $browser
+    }
+	# Check if Opera is installed
+    if(Test-Path $operaPath -PathType Container) {
+       $browser = "Opera"
        return  $browser
     }
     return     $false
@@ -217,6 +235,29 @@ try {
     }
 }
 
+#all 64Bits packages
+if ( ${env:programfiles(x86)} -And -Not $force32bitApps ) { 
+    $selIEDriverURL = $selIEDriver32URL # Disabled $selIEDriver64URL because of sendkeys high delay bug
+	$selOperaDriverURL = $selOperaDriver64URL
+	if($useOldRIDEwxPython){
+        $wxPythonURL = "https://sourceforge.net/projects/wxpython/files/wxPython/2.8.12.1/wxPython2.8-win64-unicode-2.8.12.1-py27.exe/download"
+    } else {
+        $wxPythonURL = $wxPython64URL
+    }
+	$pythonURL = $python64URL
+	$py32comURL = $py32com64URL
+#all 32 bits packages
+} else {
+        $selIEDriverURL = $selIEDriver32URL
+	$selOperaDriverURL = $selOperaDriver32URL
+	if($useOldRIDEwxPython){
+        $wxPythonURL = "https://sourceforge.net/projects/wxpython/files/wxPython/2.8.12.1/wxPython2.8-win32-unicode-2.8.12.1-py27.exe/download"
+    } else {
+        $wxPythonURL = $wxPython32URL
+    }
+	$pythonURL = $python32URL
+	$py32comURL = $py32com32URL
+}
 
 #Install Python
 try {
@@ -251,7 +292,7 @@ try {
         echo  "We'll just add it to the PATH environment variable..."
     } else {
         echo "Could not find a compatible Python installation on the root of the c:\ drive"
-        echo "Downloading the Python 2.7.9 installer..."
+        echo "Downloading the Python 2.7 installer..."
         $source = $pythonURL
         $Filename = [System.IO.Path]::GetFileName($source)
         $dest = "C:\Temp\$Filename"
@@ -267,6 +308,30 @@ try {
     setx path "$userPath;$pythonPath"   | Out-null
     $userPath = [System.Environment]::GetEnvironmentVariable("path","User")
     $env:path = [System.Environment]::GetEnvironmentVariable("path","Machine") + ";$userPath"
+}
+
+try{
+      $pythonArch = python -c "import platform; print(platform.architecture()[0])"
+      if($pythonArch -like "32*"){
+      $force32bitApps = $true # If python 32bit is installed we must use 32bit versions
+      }
+} catch{
+        echo "Warning! Unable to check the Python bit mode"
+        echo "output was: $pythonArch"
+        echo "This script will exit"
+        pause
+        Exit 
+}
+
+if($force32bitApps){
+        $selIEDriverURL = $selIEDriver32URL
+	$selOperaDriverURL = $selOperaDriver32URL
+	if($useOldRIDEwxPython){
+        $wxPythonURL = "https://sourceforge.net/projects/wxpython/files/wxPython/2.8.12.1/wxPython2.8-win32-unicode-2.8.12.1-py27.exe/download"
+    } else {
+        $wxPythonURL = $wxPython32URL
+    }
+	$py32comURL = $py32com32URL
 }
 
 
@@ -298,6 +363,15 @@ try {$pipVersion = pip -V
     $env:path = [System.Environment]::GetEnvironmentVariable("path","Machine") + ";$userPath"
 }
 
+#Upgrade pip
+try {
+    $pipup = pip install -U pip
+    echo "Upgraded pip if needed."
+} catch {
+    echo "Unable to upgrade pip."
+    pip --version
+}
+
 
 #Install the Robot Framework
 try {
@@ -326,6 +400,7 @@ else {
 }
 
 
+if($installIEDriver) {
 #Install Selenium IE driver
 try {
    #Old versions don't support the --help flag
@@ -359,8 +434,24 @@ catch {
 
     Remove-Item   $dest
 }
+}
 
+#Install Chrome
+# https://www.google.com/chrome/browser/desktop/index.html?system=true&standalone=1&platform=win64
+# ChromeStandaloneSetup64.exe /silent /install
 
+#Install Firefox
+# https://download.mozilla.org/?product=firefox-45.2.0esr-SSL&os=win64&lang=en-GB
+# "Firefox Setup 45.2.0esr.exe" /S
+
+#Install Opera
+# http://www.opera.com/computer/thanks?ni=stable&os=windows
+# Opera_38.0.2220.31_Setup.exe --silent
+
+#Install Phantomjs (like a webdriver)
+# https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-windows.zip
+
+if($installChromeDriver){
 #Install Selenium Chrome driver
 try {
     chromedriver --help | Out-null
@@ -391,11 +482,78 @@ catch {
     }
     Remove-Item   $dest  | Out-null
 }
+}
 
+if($installOperaDriver){
+#Install Opera driver
+try {
+    operadriver --version | Out-null
+    echo "The Selenium Opera driver is installed"
+} 
+catch {
+    echo "Selenium Opera driver doesn't seem to be installed"
+    echo "Downloading Opera driver ZIP..."
+    $source = $selOperaDriverURL
+    $Filename = [System.IO.Path]::GetFileName($source)
+    $dest = "c:\Temp\$Filename"
+    $wc = New-Object System.Net.WebClient
+    $wc.DownloadFile($source, $dest)
 
-#Writes a demo test script, if Firefox or Chrome are installed
+    if (!(Test-Path $selDriversFolder)) {
+        echo "Creating a folder for the Selenium drivers"
+        New-Item -ItemType directory -Path $selDriversFolder  | Out-null
+    }
+    if(!(Test-Path "$selDriversFolder\operadriver.exe")) {
+        echo "Unziping the Selenium Chrome driver to $selDriversFolder"
+        unzip  $dest  $selDriversFolder  | Out-null
+    }
+    if(! $driverFolderIsInPath) {
+        echo "Adding $selDriversFolder to PATH"
+        setx path "$userPath;$selDriversFolder"  | Out-null
+        $userPath = [System.Environment]::GetEnvironmentVariable("path","User")
+        $env:path = [System.Environment]::GetEnvironmentVariable("path","Machine") + ";$userPath"
+    }
+    Remove-Item   $dest  | Out-null
+}
+}
+
+if($installPhantomJSBrowser){
+#Install PhantomJs driver/browser
+try {
+    phantomjs --version | Out-null
+    echo "PhantomJS is installed"
+} 
+catch {
+    echo "PhantomJS doesn't seem to be installed"
+    echo "Downloading PhantomJS ZIP..."
+    $source = $selPhantomJSURL
+    $Filename = [System.IO.Path]::GetFileName($source)
+    $dest = "c:\Temp\$Filename"
+    $wc = New-Object System.Net.WebClient
+    $wc.DownloadFile($source, $dest)
+
+    if (!(Test-Path $selDriversFolder)) {
+        echo "Creating a folder for the Selenium drivers"
+        New-Item -ItemType directory -Path $selDriversFolder  | Out-null
+    }
+    if(!(Test-Path "$selDriversFolder\phantomjs.exe")) {
+        echo "Unziping PhantomJS to $selDriversFolder"
+		unzip  $dest  "c:\Temp" | Out-null
+        move   "c:\Temp\phantomjs-2.1.1-windows\bin\phantomjs.exe" $selDriversFolder  | Out-null
+    }
+    if(! $driverFolderIsInPath) {
+        echo "Adding $selDriversFolder to PATH"
+        setx path "$userPath;$selDriversFolder"  | Out-null
+        $userPath = [System.Environment]::GetEnvironmentVariable("path","User")
+        $env:path = [System.Environment]::GetEnvironmentVariable("path","Machine") + ";$userPath"
+    }
+    Remove-Item   $dest  | Out-null
+}
+}
+#Writes a demo test script, if Firefox, Chrome or Opera are installed
 $demoBrowser = getDemoBrowser
 
+echo "Browser is $demoBrowser "
 if($demoBrowser) {
 #Be carefull with the test indentation and spacing.
     echo "*Settings*
@@ -406,73 +564,114 @@ EA Installer Demo Test
     Open Browser  	http://joao-carloto.github.io/RF_Install_Script/test.html   	$demoBrowser
     Page Should Contain   	RF Install Script Test Page
     Input Text   	sometextbox   	Congratulations!
-    Input Text   	sometextarea    If you are reading this, you have completed your Robot Framework setup.\n\nTo run this test again on RIDE, click on the 'Run Tests' button.\n\nTo learn more about the immense possibilities of the Robot Framework go to http://robotframework.org/." | Out-File -encoding utf8 c:\Temp\test.txt | Out-null
+    Input Text   	sometextarea    If you are reading this, you have completed your Robot Framework setup.\n\nTo run this test again on RIDE, click on the 'Run Tests' button.\n\nTo learn more about the immense possibilities of the Robot Framework go to http://robotframework.org/." | Out-File -encoding utf8 c:\Temp\test.robot | Out-null
 }
 
 
+if($installRIDE){
 #Install wxPython
-$wxPythonFolderExists = Test-Path "$pythonPath\Lib\site-packages\wx-2.8-msw-unicode\wxPython" -PathType Any
-if($wxPythonFolderExists) {
+$wxPythonVersion = python -c "import wx; print(wx.VERSION)"
+$wxPythonVersion = [String]$wxPythonVersion
+if([Regex]::IsMatch($wxPythonVersion,"(2, 8, 12, 1, '')") -and $useOldRIDEwxPython ){
+echo  "wxPython seems to be installed"
+} elseif([Regex]::IsMatch($wxPythonVersion,"(3, 0, 2, 0, '')") -and -not $useOldRIDEwxPython) {
     echo  "wxPython seems to be installed"
 }
 else {
     echo "wxPython doesn't seem to be installed"
 
-    $pythonBitMode = python -c "import platform; print platform.architecture()"
-    $pythonBitMode = [String]$pythonBitMode
-
-    if ([Regex]::IsMatch($pythonBitMode,"32bit")) {
-        $wxPythonURL = $wxPython32URL
-    } 
-    elseif ([Regex]::IsMatch($pythonBitMode,"64bit"))  {
-        $wxPythonURL = $wxPython64URL
-    } else {
-        echo "Warning! Unable to check the Ptyhon bit mode (necessary to choose the wxPython version to install)"
-        echo "This script will exit"
-        pause
-        Exit 
-    }
+  #  $pythonBitMode = python -c "import platform; print platform.architecture()"
+  #  $pythonBitMode = [String]$pythonBitMode
+  #  if ([Regex]::IsMatch($pythonBitMode,"32bit")) {
+  #      $wxpythonURL = $wxPython32URL
+  #  } 
+  #  elseif ([Regex]::IsMatch($pythonBitMode,"64bit"))  {
+  #      $wxpythonURL = $wxPython64URL
+  #  } else {
+  #      echo "Warning! Unable to check the Python bit mode (necessary to choose the wxPython version to install)"
+  #      echo "This script will exit"
+  #      pause
+  #      Exit 
+  #  }
     echo "Downloading wxPython..."
-    $source = $wxPythonURL
-    $Filename = [System.IO.Path]::GetFileName($source)
+    $source = $wxpythonURL
+    # The filename might contain URL parameters, so we use a static name.
+    # $Filename = [System.IO.Path]::GetFileName($source)
+    $Filename = "wxPython_installer.exe"
     $dest = "C:\Temp\$Filename"
     $wc = New-Object System.Net.WebClient
+    echo "command to download wx"
+    echo $source, $dest
     $wc.DownloadFile($source, $dest)
 
     echo "Installing wxPython..."
+    echo "Please use the default actions of the Installer..."
     #Silent install mode does not work with this one
     Start-Process $dest /qn -Wait
     Remove-Item   $dest
 }
 
+if(-Not $useOldRIDEwxPython){
+#Install Pywin32
+try{
+$pywinVersion = python -c "import pywin; print('PyWin32')"  | Out-null
+# echo $pywinVersion
+if([Regex]::IsMatch($pywinVersion,"PyWin32")) {
+    echo  "pywin32 seems to be installed"
+}
+}
+catch {
+    echo "pywin32 doesn't seem to be installed"
+    echo "You must install dependency for RIDE Desktop Shortcut creation."
+    echo "Download http://downloads.sourceforge.net/project/pywin32/pywin32/Build%20220/"
+    echo "Downloading pywin32..."
+    $source = $py32comURL
+    $Filename = "pywin32.exe"
+    $dest = "C:\Temp\$Filename"
+    $wc = New-Object System.Net.WebClient
+    $wc.DownloadFile($source, $dest)
+
+    echo "Installing pywin32..."
+    #Silent install mode does not work with this one
+    Start-Process $dest /qn -Wait
+    Remove-Item   $dest
+}
+}
 
 #Install RIDE and open it
 #RIDE checks for updates on start by default, we don't have to use our checkUpdates function
 try {
    echo "Trying to open RIDE..."
    if($demoBrowser)  {
-        Start-Process ride.py  c:\Temp\test.txt
+        Start-Process ride.py  c:\Temp\test.robot
    } else {
-        Start-Process ride.py 
+        Start-Process ride.py --version
    }
 } 
 catch {
    echo "RIDE doesn't seem to be installed"
    echo "Installing RIDE..."
-   pip install robotframework-ride  | Out-null
+   if($useOldRIDEwxPython){
+   echo "Installing RIDE 1.5.2.1 from PyPY"
+   pip install robotframework-ride==1.5.2.1  | Out-null
+   } else {
+      echo "Installing RIDE from https://github.com/HelioGuilherme66/RIDE/"
+      pip install -U https://github.com/HelioGuilherme66/RIDE/archive/v2.0a2.zip | Out-null
+   }
+
    echo "Opening RIDE..."
    if($demoBrowser)  {
-        Start-Process ride.py  c:\Temp\test.txt
+        Start-Process ride.py  c:\Temp\test.robot
    } else {
-        Start-Process ride.py 
+        Start-Process ride.py --version
    }
 }
-
+}
 
 #Run a sample test with pybot
 if($demoBrowser)  {
     echo "Running a sample test..."
-    pybot -d c:\Temp  c:\Temp\test.txt  
+    pybot -d c:\Temp  c:\Temp\test.robot 
 }
 
 
