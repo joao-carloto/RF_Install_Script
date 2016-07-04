@@ -29,7 +29,7 @@ This script doesn't deal with those.
 For more info check https://code.google.com/p/selenium/wiki/InternetExplorerDriver#Required_Configuration
 
 Script: RF_Installer.ps1
-Author: João Carloto, Twitter: @JMCarloto
+Author: Joao Carloto, Twitter: @JMCarloto
 Github repo: https://github.com/joao-carloto/RF_Install_Script
 License: Apache 2.0
 Version: 0.5
@@ -91,16 +91,14 @@ Adds the folder to PATH
 
  
 wxPython Installation
-
-#### Starts by checking if the <python folder>\Lib\site-packages\wx-2.8-msw-unicode\wxPython folder exists.
 Starts by running a Python command that shows the installed wxPython version.
 If it fails, downloads the wxPython installer and runs it.
 
 
 RIDE Installation
 
-Starts by running the 'ride.py --version' command, to check the RIDE version (from 1.5.2.1).
-If it fails, will install RIDE using PIP.
+Tries to use RIDE
+If it fails, will install RIDE using PIP or the most recent version form GitHub (default)
 Tries to open RIDE again.
 
 
@@ -280,13 +278,6 @@ try {
     if (Test-Path "c:\python27\python.exe" -PathType Any) {
         $pythonPath = "c:\python27"
     } 
-    <#
-    elseif (Test-Path "c:\python26\python.exe" -PathType Any) {
-        $pythonPath = "c:\python26"
-    } elseif (Test-Path "c:\python25\python.exe" -PathType Any) {
-        $pythonPath = "c:\python25"
-    } 
-    #>
     if ($pythonPath) {
         echo  "A valid Python installation seems to exist in the default location ($pythonPath)"
         echo  "We'll just add it to the PATH environment variable..."
@@ -335,7 +326,7 @@ if($force32bitApps){
 }
 
 
-#Install PIP
+#Ensure PIP is installed and updated
 try {$pipVersion = pip -V
     echo "PIP is installed with version: $pipVersion"
 } catch {
@@ -346,16 +337,8 @@ try {$pipVersion = pip -V
         echo  "We'll just add the Scripts folder to PATH..."
     }
     else {
-        echo "PIP doesn't seem to be installed"
-        echo "Downloading PIP..."
-        $source = $pipURL
-        $Filename = [System.IO.Path]::GetFileName($source)
-        $dest = "C:\Temp\$Filename"
-        $wc = New-Object System.Net.WebClient
-        $wc.DownloadFile($source, $dest)
-        echo "Installing PIP..."
-        Start-Process python  $dest  -Wait
-        Remove-Item   $dest
+        echo "PIP doesn't seem to be installed, will work on it..."
+        python -m ensurepip  | Out-null
         echo  "Adding the Scripts folder to the PATH environment variable..."
     }
     setx path "$userPath;$pythonPath\Scripts"  | Out-null
@@ -363,14 +346,18 @@ try {$pipVersion = pip -V
     $env:path = [System.Environment]::GetEnvironmentVariable("path","Machine") + ";$userPath"
 }
 
-#Upgrade pip
+
 try {
-    $pipup = pip install -U pip
-    echo "Upgraded pip if needed."
+    echo "Upgrading pip  if needed."
+    # python -m pip install -U pip setuptools  # |  Out-null
+    #python -m ensurepip  | Out-null
+
+    python -m pip install --upgrade pip | Out-null
 } catch {
-    echo "Unable to upgrade pip."
+    echo "Unable to upgrade pip and/or setup tools."
     pip --version
 }
+
 
 
 #Install the Robot Framework
@@ -560,7 +547,7 @@ if($demoBrowser) {
 Documentation	     Test suite created with FireRobot
 Library	   Selenium2Library   15.0   5.0
 *Test Cases *
-EA Installer Demo Test
+RF Installer Demo Test
     Open Browser  	http://joao-carloto.github.io/RF_Install_Script/test.html   	$demoBrowser
     Page Should Contain   	RF Install Script Test Page
     Input Text   	sometextbox   	Congratulations!
@@ -569,6 +556,7 @@ EA Installer Demo Test
 
 
 if($installRIDE){
+echo "Checking if wxPython is installed..."
 #Install wxPython
 $wxPythonVersion = python -c "import wx; print(wx.VERSION)"
 $wxPythonVersion = [String]$wxPythonVersion
@@ -579,20 +567,6 @@ echo  "wxPython seems to be installed"
 }
 else {
     echo "wxPython doesn't seem to be installed"
-
-  #  $pythonBitMode = python -c "import platform; print platform.architecture()"
-  #  $pythonBitMode = [String]$pythonBitMode
-  #  if ([Regex]::IsMatch($pythonBitMode,"32bit")) {
-  #      $wxpythonURL = $wxPython32URL
-  #  } 
-  #  elseif ([Regex]::IsMatch($pythonBitMode,"64bit"))  {
-  #      $wxpythonURL = $wxPython64URL
-  #  } else {
-  #      echo "Warning! Unable to check the Python bit mode (necessary to choose the wxPython version to install)"
-  #      echo "This script will exit"
-  #      pause
-  #      Exit 
-  #  }
     echo "Downloading wxPython..."
     $source = $wxpythonURL
     # The filename might contain URL parameters, so we use a static name.
@@ -600,12 +574,11 @@ else {
     $Filename = "wxPython_installer.exe"
     $dest = "C:\Temp\$Filename"
     $wc = New-Object System.Net.WebClient
-    echo "command to download wx"
-    echo $source, $dest
     $wc.DownloadFile($source, $dest)
 
     echo "Installing wxPython..."
     echo "Please use the default actions of the Installer..."
+    echo "WARNING! At the end, close the wxPython README file so the script can continue."
     #Silent install mode does not work with this one
     Start-Process $dest /qn -Wait
     Remove-Item   $dest
@@ -613,8 +586,9 @@ else {
 
 if(-Not $useOldRIDEwxPython){
 #Install Pywin32
+echo "Checking if Pywin32 is installed..."
 try{
-$pywinVersion = python -c "import pywin; print('PyWin32')"  | Out-null
+$pywinVersion = python -c "import pywin; print('PyWin32')"  # | Out-null
 # echo $pywinVersion
 if([Regex]::IsMatch($pywinVersion,"PyWin32")) {
     echo  "pywin32 seems to be installed"
@@ -622,8 +596,8 @@ if([Regex]::IsMatch($pywinVersion,"PyWin32")) {
 }
 catch {
     echo "pywin32 doesn't seem to be installed"
-    echo "You must install dependency for RIDE Desktop Shortcut creation."
-    echo "Download http://downloads.sourceforge.net/project/pywin32/pywin32/Build%20220/"
+    echo "Will install this dependency for RIDE Desktop Shortcut creation."
+    #echo "Download http://downloads.sourceforge.net/project/pywin32/pywin32/Build%20220/"
     echo "Downloading pywin32..."
     $source = $py32comURL
     $Filename = "pywin32.exe"
